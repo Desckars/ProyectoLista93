@@ -1,0 +1,339 @@
+/* ─────────────────────────────
+   RESET
+───────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ─────────────────────────────
+   VARIABLES
+───────────────────────────── */
+:root {
+  --azul:        #2D84CB;
+  --azul-oscuro: #1A5A96;
+  --blanco:      #ffffff;
+}
+
+/* ─────────────────────────────
+   BASE
+───────────────────────────── */
+body {
+  font-family: 'Montserrat', sans-serif;
+  background: var(--blanco);
+  color: var(--azul-oscuro);
+}
+
+/* ─────────────────────────────
+   NAVBAR
+───────────────────────────── */
+nav {
+  display: flex;
+  align-items: center;
+  padding: 10px 24px;
+  border-bottom: 3px solid var(--azul);
+  gap: 20px;
+}
+
+.nav-marca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.nav-marca img {
+  height: 54px;
+  width: 54px;
+  object-fit: contain;
+}
+
+.nav-marca-texto {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.nav-nombre {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--azul);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  text-decoration: underline;
+}
+
+.nav-sub {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--azul);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.nav-links {
+  display: flex;
+  gap: 0;
+  margin-left: auto;
+  list-style: none;
+}
+
+.nav-links li {
+  display: flex;
+  align-items: center;
+}
+
+/* Separador | entre links */
+.nav-links li + li::before {
+  content: '|';
+  color: var(--azul);
+  font-weight: 700;
+  margin: 0 16px;
+  font-size: 18px;
+}
+
+.nav-links a {
+  color: var(--azul);
+  text-decoration: underline;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.nav-links a:hover {
+  color: var(--azul-oscuro);
+}
+
+/* ─────────────────────────────
+   HERO
+───────────────────────────── */
+.hero {
+  position: relative;
+  width: 100%;
+  height: 380px;
+  overflow: hidden;
+  background: #b0c8e0;
+}
+
+/* Imagen real — descomentá en el HTML */
+.hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: brightness(.85);
+}
+
+/* Placeholder hasta que tengas la foto */
+.hero-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #a0bcd6 0%, #c5d9ea 100%);
+}
+
+.hero-lema {
+  position: absolute;
+  bottom: 28px;
+  left: 32px;
+  font-size: clamp(36px, 6vw, 64px);
+  font-weight: 900;
+  color: var(--azul);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, .25);
+  line-height: 1;
+}
+
+/* ─────────────────────────────
+   SECCIÓN INFO
+───────────────────────────── */
+.info-section {
+  padding: 40px 36px 50px;
+}
+
+.info-texto {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--azul);
+  line-height: 1.65;
+  max-width: 640px;
+}
+
+/* ─────────────────────────────
+   CARRUSEL
+───────────────────────────── */
+.carousel {
+  position: relative;
+  width: 100%;
+  height: 380px;
+  overflow: hidden;
+  background: #b0c8e0;
+}
+
+.carousel-track {
+  display: flex;
+  height: 100%;
+  transition: transform .45s cubic-bezier(.4, 0, .2, 1);
+}
+
+.carousel-slide {
+  flex-shrink: 0;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Imagen real dentro de cada slide */
+.carousel-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(.85);
+}
+
+/* Colores placeholder para demo */
+.slide-1 { background: linear-gradient(135deg, #7faacc 0%, #aecce0 100%); }
+.slide-2 { background: linear-gradient(135deg, #5a8fb8 0%, #8fc3dd 100%); }
+.slide-3 { background: linear-gradient(135deg, #3d78a8 0%, #70aed2 100%); }
+
+/* Etiqueta de demo (quitala cuando pongas fotos reales) */
+.slide-label {
+  font-size: 28px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, .35);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  pointer-events: none;
+}
+
+/* Botones anterior / siguiente */
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+  padding: 12px;
+}
+
+.carousel-btn svg {
+  width: 52px;
+  height: 52px;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .4));
+  transition: transform .15s;
+}
+
+.carousel-btn:hover svg {
+  transform: scale(1.1);
+}
+
+.carousel-btn.prev { left: 16px; }
+.carousel-btn.next { right: 16px; }
+
+/* Puntos de navegación */
+.carousel-dots {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+}
+
+.carousel-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .5);
+  border: 2px solid rgba(255, 255, 255, .7);
+  cursor: pointer;
+  transition: background .2s;
+}
+
+.carousel-dot.active {
+  background: var(--blanco);
+}
+
+/* ─────────────────────────────
+   FOOTER
+───────────────────────────── */
+footer {
+  background: var(--azul);
+  padding: 28px 20px 20px;
+  text-align: center;
+  color: var(--blanco);
+}
+
+.footer-siguenos {
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+}
+
+.footer-iconos {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.footer-icon {
+  width: 50px;
+  height: 50px;
+  background: var(--blanco);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: transform .15s, opacity .15s;
+}
+
+.footer-icon:hover {
+  transform: scale(1.1);
+  opacity: .9;
+}
+
+.footer-icon svg {
+  width: 28px;
+  height: 28px;
+  fill: var(--azul);
+}
+
+.footer-sep {
+  width: 200px;
+  height: 2px;
+  background: rgba(255, 255, 255, .4);
+  margin: 12px auto;
+}
+
+.footer-copy {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, .85);
+  letter-spacing: .06em;
+}
+
+/* ─────────────────────────────
+   RESPONSIVE
+───────────────────────────── */
+@media (max-width: 600px) {
+  .nav-links li + li::before { margin: 0 10px; }
+  .nav-links a { font-size: 13px; }
+  .hero { height: 260px; }
+  .hero-lema { font-size: 32px; left: 20px; bottom: 18px; }
+  .carousel { height: 260px; }
+  .info-section { padding: 28px 20px 36px; }
+  .info-texto { font-size: 14px; }
+}

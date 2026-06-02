@@ -337,3 +337,12 @@ footer {
   .info-section { padding: 28px 20px 36px; }
   .info-texto { font-size: 14px; }
 }
+
+/* ─────────────────────────────
+   CONOCENOS FOTOS
+───────────────────────────── */
+.info-card {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}

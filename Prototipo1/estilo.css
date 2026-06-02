@@ -346,3 +346,9 @@ footer {
     align-items: center;
     gap: 25px;
 }
+
+.info-foto {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+}

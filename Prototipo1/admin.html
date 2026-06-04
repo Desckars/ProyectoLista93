@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel Admin — Lista93</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --azul: #2D84CB; --azul-oscuro: #1A5A96; --blanco: #ffffff; }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: #0f1923;
+    color: var(--blanco);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  /* ── LOGIN ── */
+  #pantalla-login {
+    background: #1a2634;
+    border: 1px solid #2a3a4a;
+    border-radius: 12px;
+    padding: 40px;
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+  }
+  #pantalla-login h1 {
+    font-size: 22px; font-weight: 800;
+    color: var(--azul); margin-bottom: 8px;
+  }
+  #pantalla-login p { font-size: 13px; color: #8899aa; margin-bottom: 28px; }
+
+  .campo {
+    width: 100%; padding: 12px 16px;
+    background: #0f1923; border: 2px solid #2a3a4a;
+    border-radius: 6px; color: var(--blanco);
+    font-family: 'Montserrat', sans-serif; font-size: 14px;
+    margin-bottom: 14px; transition: border-color .2s;
+  }
+  .campo:focus { outline: none; border-color: var(--azul); }
+
+  .btn {
+    width: 100%; padding: 13px;
+    background: var(--azul); color: var(--blanco);
+    border: none; border-radius: 6px; cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px; font-weight: 800;
+    letter-spacing: .06em; text-transform: uppercase;
+    transition: background .2s;
+  }
+  .btn:hover { background: var(--azul-oscuro); }
+  .btn:disabled { background: #2a3a4a; cursor: not-allowed; }
+
+  .error-msg {
+    color: #ff6b6b; font-size: 12px;
+    margin-top: 10px; display: none;
+  }
+
+  /* ── PANEL ── */
+  #pantalla-panel {
+    display: none;
+    width: 100%; max-width: 700px;
+  }
+
+  .panel-header {
+    display: flex; align-items: center;
+    justify-content: space-between; margin-bottom: 28px;
+  }
+  .panel-header h1 { font-size: 20px; font-weight: 800; color: var(--azul); }
+  .btn-salir {
+    background: none; border: 1px solid #2a3a4a;
+    color: #8899aa; padding: 7px 16px; border-radius: 6px;
+    cursor: pointer; font-size: 12px; font-family: 'Montserrat', sans-serif;
+    transition: border-color .2s, color .2s;
+  }
+  .btn-salir:hover { border-color: #ff6b6b; color: #ff6b6b; }
+
+  /* Upload area */
+  .upload-box {
+    background: #1a2634; border: 2px dashed #2a3a4a;
+    border-radius: 12px; padding: 40px 20px;
+    text-align: center; margin-bottom: 20px;
+    transition: border-color .2s;
+    cursor: pointer;
+  }
+  .upload-box:hover, .upload-box.drag-over { border-color: var(--azul); }
+  .upload-icon { font-size: 40px; margin-bottom: 12px; }
+  .upload-box p { color: #8899aa; font-size: 14px; margin-bottom: 16px; }
+  .upload-box strong { color: var(--blanco); }
+
+  #input-archivo { display: none; }
+
+  .btn-elegir {
+    display: inline-block; padding: 10px 24px;
+    background: var(--azul); color: var(--blanco);
+    border-radius: 6px; cursor: pointer;
+    font-size: 13px; font-weight: 700;
+    transition: background .2s;
+  }
+  .btn-elegir:hover { background: var(--azul-oscuro); }
+
+  .campo-desc {
+    width: 100%; padding: 11px 16px;
+    background: #1a2634; border: 2px solid #2a3a4a;
+    border-radius: 6px; color: var(--blanco);
+    font-family: 'Montserrat', sans-serif; font-size: 14px;
+    margin-bottom: 14px; transition: border-color .2s;
+  }
+  .campo-desc:focus { outline: none; border-color: var(--azul); }
+
+  /* Preview */
+  #preview-container {
+    display: none; margin-bottom: 16px;
+    background: #1a2634; border-radius: 8px;
+    padding: 12px; text-align: center;
+  }
+  #preview-img {
+    max-height: 200px; max-width: 100%;
+    border-radius: 6px; object-fit: cover;
+  }
+  #preview-nombre {
+    font-size: 12px; color: #8899aa; margin-top: 8px;
+  }
+
+  /* Progress */
+  #barra-container {
+    display: none; margin-bottom: 16px;
+  }
+  #barra-fondo {
+    background: #2a3a4a; border-radius: 4px; height: 8px; overflow: hidden;
+  }
+  #barra-progreso {
+    height: 100%; background: var(--azul);
+    border-radius: 4px; width: 0%;
+    transition: width .3s;
+  }
+  #barra-texto {
+    font-size: 12px; color: #8899aa; margin-top: 6px; text-align: center;
+  }
+
+  /* Status */
+  #status-msg {
+    text-align: center; font-size: 13px; font-weight: 700;
+    padding: 10px; border-radius: 6px; margin-bottom: 16px;
+    display: none;
+  }
+  #status-msg.ok { background: #1a3a2a; color: #4ade80; }
+  #status-msg.error { background: #3a1a1a; color: #ff6b6b; }
+
+  /* Galería */
+  .galeria-titulo {
+    font-size: 14px; font-weight: 800; color: #8899aa;
+    text-transform: uppercase; letter-spacing: .08em;
+    margin: 28px 0 14px;
+  }
+  .galeria-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+  }
+  .galeria-item {
+    background: #1a2634; border-radius: 8px; overflow: hidden;
+    position: relative;
+  }
+  .galeria-item img {
+    width: 100%; height: 110px; object-fit: cover; display: block;
+  }
+  .galeria-item-info {
+    padding: 8px 10px;
+  }
+  .galeria-item-desc {
+    font-size: 11px; color: #8899aa;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .btn-borrar {
+    position: absolute; top: 6px; right: 6px;
+    background: rgba(255,107,107,.9); color: white;
+    border: none; border-radius: 4px; width: 24px; height: 24px;
+    cursor: pointer; font-size: 14px; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .galeria-vacia {
+    color: #8899aa; font-size: 13px; text-align: center;
+    padding: 20px; grid-column: 1/-1;
+  }
+</style>
+</head>
+<body>
+
+<!-- PANTALLA LOGIN -->
+<div id="pantalla-login">
+  <h1>🔒 Panel Admin</h1>
+  <p>Acceso restringido al administrador</p>
+  <input type="password" id="input-pass" class="campo" placeholder="Contraseña" onkeydown="if(event.key==='Enter')login()">
+  <button class="btn" onclick="login()">Ingresar</button>
+  <div class="error-msg" id="error-login">Contraseña incorrecta</div>
+</div>
+
+<!-- PANTALLA PANEL -->
+<div id="pantalla-panel">
+  <div class="panel-header">
+    <h1>📸 Panel de Imágenes</h1>
+    <button class="btn-salir" onclick="salir()">Cerrar sesión</button>
+  </div>
+
+  <!-- Upload box -->
+  <div class="upload-box" id="upload-box"
+    ondragover="event.preventDefault();this.classList.add('drag-over')"
+    ondragleave="this.classList.remove('drag-over')"
+    ondrop="onDrop(event)">
+    <div class="upload-icon">🖼️</div>
+    <p><strong>Arrastrá una imagen acá</strong><br>o elegila desde tu dispositivo</p>
+    <label class="btn-elegir" for="input-archivo">Elegir imagen</label>
+    <input type="file" id="input-archivo" accept="image/*" onchange="onArchivoElegido(event)">
+  </div>
+
+  <!-- Preview -->
+  <div id="preview-container">
+    <img id="preview-img" src="" alt="preview">
+    <div id="preview-nombre"></div>
+  </div>
+
+  <!-- Descripción -->
+  <input type="text" id="input-desc" class="campo-desc" placeholder="Descripción (opcional)">
+
+  <!-- Barra de progreso -->
+  <div id="barra-container">
+    <div id="barra-fondo"><div id="barra-progreso"></div></div>
+    <div id="barra-texto">Subiendo...</div>
+  </div>
+
+  <!-- Status -->
+  <div id="status-msg"></div>
+
+  <!-- Botón subir -->
+  <button class="btn" id="btn-subir" onclick="subirImagen()" disabled>Subir imagen</button>
+
+  <!-- Galería -->
+  <div class="galeria-titulo">Imágenes en el carrusel</div>
+  <div class="galeria-grid" id="galeria"></div>
+</div>
+
+<script>
+  // ── CONFIGURACIÓN ──────────────────────────────
+  const SUPABASE_URL    = 'https://lnqqmoflqbbgstxlujy.supabase.co';
+  const SUPABASE_KEY    = 'sb_publishable_ehNfp-wrQtIqlDbtNesRww_iFNWR-H3';
+  const BUCKET          = 'imagenes';
+  const PASSWORD        = 'admin93';   // ← CAMBIÁ ESTA CONTRASEÑA
+
+  // ── HEADERS ────────────────────────────────────
+  const headers = {
+    'apikey': SUPABASE_KEY,
+    'Authorization': 'Bearer ' + SUPABASE_KEY,
+    'Content-Type': 'application/json'
+  };
+
+  // ── LOGIN ──────────────────────────────────────
+  function login() {
+    const pass = document.getElementById('input-pass').value;
+    if (pass === PASSWORD) {
+      document.getElementById('pantalla-login').style.display = 'none';
+      document.getElementById('pantalla-panel').style.display = 'block';
+      cargarGaleria();
+    } else {
+      document.getElementById('error-login').style.display = 'block';
+    }
+  }
+
+  function salir() {
+    document.getElementById('pantalla-panel').style.display = 'none';
+    document.getElementById('pantalla-login').style.display = 'block';
+    document.getElementById('input-pass').value = '';
+  }
+
+  // ── ARCHIVO ELEGIDO ────────────────────────────
+  let archivoActual = null;
+
+  function onArchivoElegido(e) {
+    const file = e.target.files[0];
+    if (file) mostrarPreview(file);
+  }
+
+  function onDrop(e) {
+    e.preventDefault();
+    document.getElementById('upload-box').classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) mostrarPreview(file);
+  }
+
+  function mostrarPreview(file) {
+    archivoActual = file;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      document.getElementById('preview-img').src = e.target.result;
+      document.getElementById('preview-nombre').textContent = file.name;
+      document.getElementById('preview-container').style.display = 'block';
+      document.getElementById('btn-subir').disabled = false;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ── SUBIR IMAGEN ───────────────────────────────
+  async function subirImagen() {
+    if (!archivoActual) return;
+
+    const btn = document.getElementById('btn-subir');
+    btn.disabled = true;
+    mostrarStatus('', '');
+
+    // Nombre único para el archivo
+    const ext      = archivoActual.name.split('.').pop();
+    const nombre   = Date.now() + '.' + ext;
+    const desc     = document.getElementById('input-desc').value || '';
+
+    // Mostrar barra
+    document.getElementById('barra-container').style.display = 'block';
+    document.getElementById('barra-progreso').style.width = '30%';
+    document.getElementById('barra-texto').textContent = 'Subiendo imagen...';
+
+    try {
+      // 1. Subir al Storage
+      const res = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${nombre}`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Content-Type': archivoActual.type,
+          'x-upsert': 'true'
+        },
+        body: archivoActual
+      });
+
+      document.getElementById('barra-progreso').style.width = '70%';
+      document.getElementById('barra-texto').textContent = 'Guardando en base de datos...';
+
+      if (!res.ok) throw new Error('Error al subir la imagen');
+
+      // 2. Obtener URL pública
+      const url = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${nombre}`;
+
+      // 3. Guardar URL en la tabla fotos
+      const res2 = await fetch(`${SUPABASE_URL}/rest/v1/fotos`, {
+        method: 'POST',
+        headers: { ...headers, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ url, descripcion: desc })
+      });
+
+      if (!res2.ok) throw new Error('Error al guardar en base de datos');
+
+      document.getElementById('barra-progreso').style.width = '100%';
+      document.getElementById('barra-texto').textContent = '¡Listo!';
+
+      setTimeout(() => {
+        document.getElementById('barra-container').style.display = 'none';
+        document.getElementById('barra-progreso').style.width = '0%';
+      }, 800);
+
+      mostrarStatus('✅ Imagen subida correctamente', 'ok');
+      limpiarForm();
+      cargarGaleria();
+
+    } catch (err) {
+      document.getElementById('barra-container').style.display = 'none';
+      mostrarStatus('❌ Error: ' + err.message, 'error');
+      btn.disabled = false;
+    }
+  }
+
+  function limpiarForm() {
+    archivoActual = null;
+    document.getElementById('input-archivo').value = '';
+    document.getElementById('input-desc').value = '';
+    document.getElementById('preview-container').style.display = 'none';
+    document.getElementById('btn-subir').disabled = true;
+  }
+
+  function mostrarStatus(msg, tipo) {
+    const el = document.getElementById('status-msg');
+    el.textContent = msg;
+    el.className = tipo;
+    el.style.display = msg ? 'block' : 'none';
+  }
+
+  // ── CARGAR GALERÍA ─────────────────────────────
+  async function cargarGaleria() {
+    const grid = document.getElementById('galeria');
+    grid.innerHTML = '<div class="galeria-vacia">Cargando...</div>';
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/fotos?select=*&order=created_at.desc`, { headers });
+      const fotos = await res.json();
+
+      if (!fotos.length) {
+        grid.innerHTML = '<div class="galeria-vacia">No hay imágenes todavía</div>';
+        return;
+      }
+
+      grid.innerHTML = fotos.map(f => `
+        <div class="galeria-item" id="item-${f.id}">
+          <img src="${f.url}" alt="${f.descripcion || ''}">
+          <button class="btn-borrar" onclick="borrarFoto(${f.id}, '${f.url}')" title="Borrar">✕</button>
+          <div class="galeria-item-info">
+            <div class="galeria-item-desc">${f.descripcion || 'Sin descripción'}</div>
+          </div>
+        </div>
+      `).join('');
+    } catch(e) {
+      grid.innerHTML = '<div class="galeria-vacia">Error al cargar imágenes</div>';
+    }
+  }
+
+  // ── BORRAR FOTO ────────────────────────────────
+  async function borrarFoto(id, url) {
+    if (!confirm('¿Borrar esta imagen?')) return;
+    try {
+      // Extraer nombre del archivo de la URL
+      const nombre = url.split('/').pop();
+
+      // Borrar del Storage
+      await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${nombre}`, {
+        method: 'DELETE',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+      });
+
+      // Borrar de la base de datos
+      await fetch(`${SUPABASE_URL}/rest/v1/fotos?id=eq.${id}`, {
+        method: 'DELETE',
+        headers
+      });
+
+      document.getElementById('item-' + id)?.remove();
+      mostrarStatus('🗑️ Imagen borrada', 'ok');
+    } catch(e) {
+      mostrarStatus('❌ Error al borrar', 'error');
+    }
+  }
+</script>
+</body>
+</html>

@@ -13,9 +13,11 @@
 <!-- SPLASH SCREEN -->
 <div id="splash" class="splash">
   <div class="splash-content">
-    <!-- Logo giratorio -->
-    <div class="logo-container">
-      <img id="logo-fondo" src="Imagenes/logo_fondo.png" alt="Logo fondo">
+    <!-- Logo giratorio y 93 juntos -->
+    <div class="logo-wrapper">
+      <div class="logo-container">
+        <img id="logo-fondo" src="Imagenes/logo_fondo.png" alt="Logo fondo">
+      </div>
       <img id="logo-93" src="Imagenes/logo_93.png" alt="93">
     </div>
   </div>
@@ -200,15 +202,15 @@ function showSplash() {
   // Marcar que ya se mostró
   sessionStorage.setItem('splashShown', 'true');
 
-  // Después de que termine de girar (8 segundos), mover al header
+  // Después de que termine de girar (5 segundos), mover al header
   setTimeout(() => {
     splash.classList.add('move-to-header');
 
     // Ocultar splash completamente después del movimiento
     setTimeout(() => {
       splash.classList.add('hidden');
-    }, 2300);
-  }, 8200);
+    }, 1800);
+  }, 5200);
 }
 
 window.onload = showSplash;

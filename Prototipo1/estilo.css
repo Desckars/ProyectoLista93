@@ -352,3 +352,13 @@ footer {
     height: 120px;
     object-fit: contain;
 }
+
+/* ─────────────────────────────
+   CONOCENOS TITULOS
+───────────────────────────── */
+.titulo-cargo {
+    text-align: center;
+    margin: 30px 0;
+    font-size: 2rem;
+    font-weight: bold;
+}

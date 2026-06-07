@@ -190,6 +190,14 @@ nav {
   max-width: 640px;
 }
 
+.descripción-texto {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--azul);
+  line-height: 1.65;
+  width: 100%;
+}
+
 /* ─────────────────────────────
    CARRUSEL
 ───────────────────────────── */

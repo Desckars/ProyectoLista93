@@ -136,6 +136,141 @@ nav {
 }
 
 /* ─────────────────────────────
+   CALENDAR MODAL
+───────────────────────────── */
+/* ─────────────────────────────
+   MODAL CALENDARIO
+───────────────────────────── */
+
+.calendar-modal {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0,0,0,.7);
+    z-index: 9999;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    opacity: 0;
+    visibility: hidden;
+
+    transition:
+        opacity 0.25s ease,
+        visibility 0.25s ease;
+}
+
+.calendar-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Ventana */
+
+.calendar-modal-content {
+    width: 90%;
+    max-width: 1400px;
+    height: 85vh;
+
+    background: white;
+    border-radius: 20px;
+
+    overflow: hidden;
+
+    box-shadow: 0 15px 50px rgba(0,0,0,.3);
+
+    transform: scale(.95);
+    transition: transform 0.25s ease;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar-modal.active .calendar-modal-content {
+    transform: scale(1);
+}
+
+/* Barra superior */
+
+.calendar-topbar {
+    height: 60px;
+    min-height: 60px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 20px;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.calendar-topbar h2 {
+    margin: 0;
+
+    font-size: 1.2rem;
+    font-weight: 700;
+
+    color: #333;
+}
+
+/* Botón cerrar */
+
+.calendar-close {
+    width: 40px;
+    height: 40px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: transparent;
+
+    font-size: 1.8rem;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background-color .2s ease,
+        transform .2s ease;
+}
+
+.calendar-close:hover {
+    background: #f2f2f2;
+    transform: scale(1.1);
+}
+
+/* Iframe */
+
+.calendar-modal-content iframe {
+    flex: 1;
+    width: 100%;
+    border: none;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+
+    .calendar-modal-content {
+        width: 95%;
+        height: 90vh;
+    }
+
+    .calendar-topbar h2 {
+        font-size: 1rem;
+    }
+
+    .calendar-close {
+        width: 35px;
+        height: 35px;
+        font-size: 1.5rem;
+    }
+}
+/* ─────────────────────────────
    HERO
 ───────────────────────────── */
 .hero {

@@ -41,6 +41,8 @@ nav {
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
+  animation: fadeInText 0.6s ease forwards 5s;
+  opacity: 0;
 }
 
 .nav-marca img {
@@ -62,6 +64,8 @@ nav {
   text-transform: uppercase;
   letter-spacing: .04em;
   text-decoration: underline;
+  animation: fadeInText 0.6s ease forwards 5.2s;
+  opacity: 0;
 }
 
 .nav-sub {
@@ -70,6 +74,8 @@ nav {
   color: var(--azul);
   letter-spacing: .1em;
   text-transform: uppercase;
+  animation: fadeInText 0.6s ease forwards 5.4s;
+  opacity: 0;
 }
 
 .nav-links {
@@ -77,6 +83,8 @@ nav {
   gap: 0;
   margin-left: auto;
   list-style: none;
+  opacity: 0;
+  animation: fadeInText 0.3s ease forwards 5.6s;
 }
 
 .nav-links li {
@@ -91,6 +99,9 @@ nav {
   font-weight: 700;
   margin: 0 16px;
   font-size: 18px;
+  animation: fadeInText 0.6s ease forwards;
+  opacity: 0;
+  animation-delay: 5.7s;
 }
 
 .nav-links a {
@@ -100,6 +111,20 @@ nav {
   font-weight: 800;
   letter-spacing: .06em;
   text-transform: uppercase;
+  animation: fadeInText 0.6s ease forwards;
+  opacity: 0;
+}
+
+.nav-links li:nth-child(1) a {
+  animation-delay: 5.6s;
+}
+
+.nav-links li:nth-child(2) a {
+  animation-delay: 5.8s;
+}
+
+.nav-links li:nth-child(3) a {
+  animation-delay: 6s;
 }
 
 .nav-links a:hover {
@@ -351,4 +376,103 @@ footer {
     width: 120px;
     height: 120px;
     object-fit: contain;
+}
+
+/* ─────────────────────────────
+   CONOCENOS TITULOS
+───────────────────────────── */
+.titulo-cargo {
+    text-align: center;
+    margin: 30px 0;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+/* ====================== SPLASH SCREEN ====================== */
+.splash {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #0a1f3d, #1e3a8a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.8s ease;
+}
+
+.splash-content {
+  text-align: center;
+}
+
+.logo-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 280px;
+  height: 280px;
+}
+
+.logo-container {
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  animation: spin 5s linear forwards;
+}
+
+#logo-fondo {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  filter: drop-shadow(0 0 30px rgba(59, 130, 246, 0.8));
+}
+
+#logo-93 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 110px;
+  z-index: 2;
+}
+
+/* Animación de giro solo del fondo */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Fase 2: Mover logo al header en línea recta */
+.splash.move-to-header .logo-wrapper {
+  animation: moveToHeader 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.splash.move-to-header .logo-container {
+  width: 65px;
+  height: 65px;
+}
+
+@keyframes moveToHeader {
+  to {
+    transform: translate(-320px, -195px) scale(0.23);
+  }
+}
+
+@keyframes fadeInText {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Ocultar splash */
+.splash.hidden {
+  opacity: 0;
+  pointer-events: none;
 }

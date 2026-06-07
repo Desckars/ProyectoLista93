@@ -4,7 +4,35 @@
 <script src="navbar.js" defer></script>
 </head>
 <body>
-<custom-navbar></custom-navbar>
+
+<!-- SPLASH SCREEN -->
+<div id="splash" class="splash">
+  <div class="splash-content">
+    <!-- Logo giratorio y 93 juntos -->
+    <div class="logo-wrapper">
+      <div class="logo-container">
+        <img id="logo-fondo" src="Imagenes/logo_fondo.png" alt="Logo fondo">
+      </div>
+      <img id="logo-93" src="Imagenes/logo_93.png" alt="93">
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-marca">
+    <img src="Imagenes/logo.jpeg" alt="Logo">
+    <div class="nav-marca-texto">
+      <span class="nav-nombre">Vanguardia del Ceibo</span>
+      <span class="nav-sub">Maldonado &mdash; Uruguay</span>
+    </div>
+  </div>
+  <ul class="nav-links">
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="conocenos.html">Conócenos</a></li>
+    <li><a href="que_hacemos.html">Qué Hacemos</a></li>
+  </ul>
+</nav>
 
 <!-- HERO -->
 <div class="hero">
@@ -69,7 +97,7 @@
     </a>
   </div>
   <div class="footer-sep"></div>
-  <div class="footer-copy">2026 Nombre del Grupo</div>
+  <div class="footer-copy">2026 Vanguardia del Ceibo</div>
 </footer>
 
 <script>
@@ -155,6 +183,32 @@
   }
 
   cargarFotos();
+
+  // ==================== SPLASH SCREEN LOGIC ====================
+const splash = document.getElementById('splash');
+
+function showSplash() {
+  // Si ya se mostró en esta sesión, saltar
+  if (sessionStorage.getItem('splashShown') === 'true') {
+    splash.style.display = 'none';
+    return;
+  }
+
+  // Marcar que ya se mostró
+  sessionStorage.setItem('splashShown', 'true');
+
+  // Después de que termine de girar (5 segundos), mover al header
+  setTimeout(() => {
+    splash.classList.add('move-to-header');
+
+    // Ocultar splash completamente después del movimiento
+    setTimeout(() => {
+      splash.classList.add('hidden');
+    }, 1800);
+  }, 5200);
+}
+
+window.onload = showSplash;
 </script>
 
 </body>

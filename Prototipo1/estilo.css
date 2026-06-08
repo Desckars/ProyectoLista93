@@ -623,3 +623,23 @@ footer {
   opacity: 0;
   pointer-events: none;
 }
+
+/*  -MAPA-  */
+.mapa-section{
+    padding: 60px 0;
+    background-color: #f0f0f0;
+    text-align: center;
+}
+
+.mapa-titulo{
+    font-size: 2rem;
+    margin-bottom: 25px;
+}
+
+.mapa-section iframe{
+    width: 80%;          /* Reduce el ancho */
+    max-width: 1000px;   /* Máximo en pantallas grandes */
+    height: 500px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}

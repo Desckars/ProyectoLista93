@@ -5,190 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Panel Admin — Lista93</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root { --azul: #2D84CB; --azul-oscuro: #1A5A96; --blanco: #ffffff; }
+<link rel="stylesheet" href="estiloadmin.css">
 
-  body {
-    font-family: 'Montserrat', sans-serif;
-    background: #0f1923;
-    color: var(--blanco);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
-
-  /* ── LOGIN ── */
-  #pantalla-login {
-    background: #1a2634;
-    border: 1px solid #2a3a4a;
-    border-radius: 12px;
-    padding: 40px;
-    width: 100%;
-    max-width: 380px;
-    text-align: center;
-  }
-  #pantalla-login h1 {
-    font-size: 22px; font-weight: 800;
-    color: var(--azul); margin-bottom: 8px;
-  }
-  #pantalla-login p { font-size: 13px; color: #8899aa; margin-bottom: 28px; }
-
-  .campo {
-    width: 100%; padding: 12px 16px;
-    background: #0f1923; border: 2px solid #2a3a4a;
-    border-radius: 6px; color: var(--blanco);
-    font-family: 'Montserrat', sans-serif; font-size: 14px;
-    margin-bottom: 14px; transition: border-color .2s;
-  }
-  .campo:focus { outline: none; border-color: var(--azul); }
-
-  .btn {
-    width: 100%; padding: 13px;
-    background: var(--azul); color: var(--blanco);
-    border: none; border-radius: 6px; cursor: pointer;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 14px; font-weight: 800;
-    letter-spacing: .06em; text-transform: uppercase;
-    transition: background .2s;
-  }
-  .btn:hover { background: var(--azul-oscuro); }
-  .btn:disabled { background: #2a3a4a; cursor: not-allowed; }
-
-  .error-msg {
-    color: #ff6b6b; font-size: 12px;
-    margin-top: 10px; display: none;
-  }
-
-  /* ── PANEL ── */
-  #pantalla-panel {
-    display: none;
-    width: 100%; max-width: 700px;
-  }
-
-  .panel-header {
-    display: flex; align-items: center;
-    justify-content: space-between; margin-bottom: 28px;
-  }
-  .panel-header h1 { font-size: 20px; font-weight: 800; color: var(--azul); }
-  .btn-salir {
-    background: none; border: 1px solid #2a3a4a;
-    color: #8899aa; padding: 7px 16px; border-radius: 6px;
-    cursor: pointer; font-size: 12px; font-family: 'Montserrat', sans-serif;
-    transition: border-color .2s, color .2s;
-  }
-  .btn-salir:hover { border-color: #ff6b6b; color: #ff6b6b; }
-
-  /* Upload area */
-  .upload-box {
-    background: #1a2634; border: 2px dashed #2a3a4a;
-    border-radius: 12px; padding: 40px 20px;
-    text-align: center; margin-bottom: 20px;
-    transition: border-color .2s;
-    cursor: pointer;
-  }
-  .upload-box:hover, .upload-box.drag-over { border-color: var(--azul); }
-  .upload-icon { font-size: 40px; margin-bottom: 12px; }
-  .upload-box p { color: #8899aa; font-size: 14px; margin-bottom: 16px; }
-  .upload-box strong { color: var(--blanco); }
-
-  #input-archivo { display: none; }
-
-  .btn-elegir {
-    display: inline-block; padding: 10px 24px;
-    background: var(--azul); color: var(--blanco);
-    border-radius: 6px; cursor: pointer;
-    font-size: 13px; font-weight: 700;
-    transition: background .2s;
-  }
-  .btn-elegir:hover { background: var(--azul-oscuro); }
-
-  .campo-desc {
-    width: 100%; padding: 11px 16px;
-    background: #1a2634; border: 2px solid #2a3a4a;
-    border-radius: 6px; color: var(--blanco);
-    font-family: 'Montserrat', sans-serif; font-size: 14px;
-    margin-bottom: 14px; transition: border-color .2s;
-  }
-  .campo-desc:focus { outline: none; border-color: var(--azul); }
-
-  /* Preview */
-  #preview-container {
-    display: none; margin-bottom: 16px;
-    background: #1a2634; border-radius: 8px;
-    padding: 12px; text-align: center;
-  }
-  #preview-img {
-    max-height: 200px; max-width: 100%;
-    border-radius: 6px; object-fit: cover;
-  }
-  #preview-nombre {
-    font-size: 12px; color: #8899aa; margin-top: 8px;
-  }
-
-  /* Progress */
-  #barra-container {
-    display: none; margin-bottom: 16px;
-  }
-  #barra-fondo {
-    background: #2a3a4a; border-radius: 4px; height: 8px; overflow: hidden;
-  }
-  #barra-progreso {
-    height: 100%; background: var(--azul);
-    border-radius: 4px; width: 0%;
-    transition: width .3s;
-  }
-  #barra-texto {
-    font-size: 12px; color: #8899aa; margin-top: 6px; text-align: center;
-  }
-
-  /* Status */
-  #status-msg {
-    text-align: center; font-size: 13px; font-weight: 700;
-    padding: 10px; border-radius: 6px; margin-bottom: 16px;
-    display: none;
-  }
-  #status-msg.ok { background: #1a3a2a; color: #4ade80; }
-  #status-msg.error { background: #3a1a1a; color: #ff6b6b; }
-
-  /* Galería */
-  .galeria-titulo {
-    font-size: 14px; font-weight: 800; color: #8899aa;
-    text-transform: uppercase; letter-spacing: .08em;
-    margin: 28px 0 14px;
-  }
-  .galeria-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 12px;
-  }
-  .galeria-item {
-    background: #1a2634; border-radius: 8px; overflow: hidden;
-    position: relative;
-  }
-  .galeria-item img {
-    width: 100%; height: 110px; object-fit: cover; display: block;
-  }
-  .galeria-item-info {
-    padding: 8px 10px;
-  }
-  .galeria-item-desc {
-    font-size: 11px; color: #8899aa;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .btn-borrar {
-    position: absolute; top: 6px; right: 6px;
-    background: rgba(255,107,107,.9); color: white;
-    border: none; border-radius: 4px; width: 24px; height: 24px;
-    cursor: pointer; font-size: 14px; line-height: 1;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .galeria-vacia {
-    color: #8899aa; font-size: 13px; text-align: center;
-    padding: 20px; grid-column: 1/-1;
-  }
-</style>
 </head>
 <body>
 
@@ -207,6 +25,84 @@
     <h1>📸 Panel de Imágenes</h1>
     <button class="btn-salir" onclick="salir()">Cerrar sesión</button>
   </div>
+  !-- ── SECCIÓN CALENDARIO (agregar dentro de pantalla-panel en admin.html) ── 
+
+<div style="margin-top: 36px; border-top: 1px solid #2a3a4a; padding-top: 28px;">
+  <div class="galeria-titulo">📅 Link del Calendario</div>
+ 
+  <div style="display: flex; gap: 10px; align-items: center;">
+    <input
+      type="url"
+      id="input-calendario"
+      class="campo-desc"
+      placeholder="https://calendar.google.com/..."
+      style="flex: 1; margin-bottom: 0;"
+    >
+    <button
+      class="btn"
+      onclick="guardarCalendario()"
+      style="width: auto; padding: 11px 24px; white-space: nowrap;"
+    >
+      Guardar
+    </button>
+  </div>
+ 
+  <div id="status-calendario" style="
+    margin-top: 10px; font-size: 13px; font-weight: 700;
+    padding: 8px 12px; border-radius: 6px; display: none;
+  "></div>
+</div>
+ 
+<script>
+  // ── Cargar el link actual al abrir el panel ──
+  async function cargarCalendario() {
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/calendario?id=eq.1&select=link`, {
+        headers
+      });
+      const data = await res.json();
+      if (data.length && data[0].link) {
+        document.getElementById('input-calendario').value = data[0].link;
+      }
+    } catch(e) {
+      console.error('Error cargando calendario:', e);
+    }
+  }
+ 
+  // ── Guardar el link ──
+  async function guardarCalendario() {
+    const link = document.getElementById('input-calendario').value.trim();
+    const statusEl = document.getElementById('status-calendario');
+ 
+    if (!link) {
+      mostrarStatusCal('⚠️ Ingresá un link válido', 'error');
+      return;
+    }
+ 
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/calendario?id=eq.1`, {
+        method: 'PATCH',
+        headers: { ...headers, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ link })
+      });
+ 
+      if (!res.ok) throw new Error('Error al guardar');
+      mostrarStatusCal('✅ Link guardado correctamente', 'ok');
+ 
+    } catch(e) {
+      mostrarStatusCal('❌ Error al guardar el link', 'error');
+    }
+  }
+ 
+  function mostrarStatusCal(msg, tipo) {
+    const el = document.getElementById('status-calendario');
+    el.textContent = msg;
+    el.style.display = 'block';
+    el.style.background = tipo === 'ok' ? '#1a3a2a' : '#3a1a1a';
+    el.style.color = tipo === 'ok' ? '#4ade80' : '#ff6b6b';
+    setTimeout(() => el.style.display = 'none', 3000);
+  }
+</script>
 
   <!-- Upload box -->
   <div class="upload-box" id="upload-box"
@@ -266,6 +162,8 @@
       document.getElementById('pantalla-login').style.display = 'none';
       document.getElementById('pantalla-panel').style.display = 'block';
       cargarGaleria();
+      //NUEVO
+      cargarCalendario();
     } else {
       document.getElementById('error-login').style.display = 'block';
     }

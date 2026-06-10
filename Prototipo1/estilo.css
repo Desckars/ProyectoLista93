@@ -43,7 +43,7 @@ nav {
   flex-shrink: 0;
 }
 
-/* New: Layered structure configuration to preserve the 54x54px bounds */
+/* wrapper para el logo combinado */
 .nav-logo-wrapper {
   position: relative;
   width: 54px;
@@ -52,7 +52,7 @@ nav {
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0; /* Keeps it completely hidden until the splash ends */
+  opacity: 0; /* esto lo mantiene oculto hasta que termine el splash */
 }
 
 .nav-logo-wrapper img {
@@ -66,20 +66,25 @@ nav {
 
 .nav-logo-fondo {
   z-index: 1;
-  transition: transform 0.6s ease-out; /* Smooth spin deceleration on mouse leave */
+  transition: transform 0.6s ease-out; 
 }
 
 .nav-logo-93 {
   z-index: 2;
 }
 
-/* CHANGE THIS: Target the custom element tag instead of the inner nav */
+/* animacion del logo post splash screen */
 .splash.hidden ~ custom-navbar .nav-logo-wrapper,
 .splash.hidden + custom-navbar .nav-logo-wrapper {
   animation: slideLogoToNav 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
+/* logo si no hay splash*/
+[style*="display: none"] ~ custom-navbar .nav-logo-wrapper,
+[style*="display: none"] + custom-navbar .nav-logo-wrapper {
+  opacity: 1;
+}
 
-/* Hover effect rules */
+/* efecto de girar cuando pones el mouse arriba del logo */
 .nav-marca:hover .nav-logo-fondo {
   animation: navLogoSpin 2s linear infinite;
 }

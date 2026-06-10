@@ -78,9 +78,13 @@ nav {
 .splash.hidden + custom-navbar .nav-logo-wrapper {
   animation: slideLogoToNav 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
-/* logo si no hay splash*/
+/* logo si no hay splash en principal*/
 [style*="display: none"] ~ custom-navbar .nav-logo-wrapper,
 [style*="display: none"] + custom-navbar .nav-logo-wrapper {
+  opacity: 1;
+}
+
+body:not(:has(.splash)) custom-navbar .nav-logo-wrapper {
   opacity: 1;
 }
 

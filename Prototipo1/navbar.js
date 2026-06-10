@@ -7,7 +7,11 @@ class NavbarComponent extends HTMLElement {
         <nav>
         
             <div class="nav-marca">
-                <img src="Imagenes/logo.jpeg" alt="Logo">
+                <div class="nav-logo-wrapper">
+                    <img class="nav-logo-fondo" src="Imagenes/logo_fondo.png" alt="Logo fondo">
+                    <img class="nav-logo-93" src="Imagenes/logo_93.png" alt="93">
+                </div>
+                
                 <div class="nav-marca-texto">
                     <span class="nav-nombre">Vanguardia del Ceibo</span>
                     <span class="nav-sub">Maldonado — Uruguay</span>

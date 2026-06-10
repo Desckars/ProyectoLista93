@@ -43,11 +43,50 @@ nav {
   flex-shrink: 0;
 }
 
-.nav-marca img {
-  height: 54px;
+/* New: Layered structure configuration to preserve the 54x54px bounds */
+.nav-logo-wrapper {
+  position: relative;
   width: 54px;
+  height: 54px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0; /* Keeps it completely hidden until the splash ends */
+}
+
+.nav-logo-wrapper img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
-  animation: slideLogoToNav 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards 6.5s;
+  top: 0;
+  left: 0;
+}
+
+.nav-logo-fondo {
+  z-index: 1;
+  transition: transform 0.6s ease-out; /* Smooth spin deceleration on mouse leave */
+}
+
+.nav-logo-93 {
+  z-index: 2;
+}
+
+/* CHANGE THIS: Target the custom element tag instead of the inner nav */
+.splash.hidden ~ custom-navbar .nav-logo-wrapper,
+.splash.hidden + custom-navbar .nav-logo-wrapper {
+  animation: slideLogoToNav 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+/* Hover effect rules */
+.nav-marca:hover .nav-logo-fondo {
+  animation: navLogoSpin 2s linear infinite;
+}
+
+@keyframes navLogoSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
 .nav-marca-texto {

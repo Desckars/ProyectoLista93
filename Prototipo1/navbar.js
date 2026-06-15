@@ -1,8 +1,37 @@
-const CALENDAR_URL =
-"https://calendar.google.com/calendar/embed?wkst=1&ctz=America%2FMontevideo&src=ZGFlZGRhNjAwOWM0OGFjNGQyNTk2ZTc1YmI1MjgzZGRiM2YyNzRjODM4MjNlOWQyNmZjZmIwMzI0OTVlZDlhM0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&color=%23e67c73";
+console.debug('navbar.js loaded');
+const NAV_SUPABASE_URL = (typeof SUPABASE_URL !== 'undefined') ? SUPABASE_URL : 'https://lnqqmoflqbbgxstxlujy.supabase.co';
+const NAV_SUPABASE_KEY = (typeof SUPABASE_KEY !== 'undefined') ? SUPABASE_KEY : 'sb_publishable_ehNfp-wrQtIqlDbtNesRww_iFNWR-H3';
+const CALENDAR_FALLBACK_URL =
+    'https://calendar.google.com/calendar/embed?wkst=1&ctz=America%2FMontevideo&src=ZGFlZGRhNjAwOWM0OGFjNGQyNTk2ZTc1YmI1MjgzZGRiM2YyNzRjODM4MjNlOWQyNmZjZmIwMzI0OTVlZDlhM0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&color=%23e67c73';
+
+async function getCalendarUrl() {
+    try {
+        const res = await fetch(
+            `${NAV_SUPABASE_URL}/rest/v1/calendario?id=eq.1&select=link`,
+            {
+                headers: {
+                    apikey: NAV_SUPABASE_KEY,
+                    Authorization: 'Bearer ' + NAV_SUPABASE_KEY
+                }
+            }
+        );
+
+        if (!res.ok) {
+            console.error('Error fetching calendar URL:', res.status, await res.text());
+            return CALENDAR_FALLBACK_URL;
+        }
+
+        const data = await res.json();
+        return data.length && data[0].link ? data[0].link : CALENDAR_FALLBACK_URL;
+    } catch (error) {
+        console.error('Error fetching calendar URL:', error);
+        return CALENDAR_FALLBACK_URL;
+    }
+}
 
 class NavbarComponent extends HTMLElement {
     connectedCallback() {
+        console.debug('custom-navbar connectedCallback');
         this.innerHTML = `
         <nav>
         
@@ -47,7 +76,7 @@ class NavbarComponent extends HTMLElement {
                 </div>
 
                 <iframe
-                    src="${CALENDAR_URL}"
+                    src="${CALENDAR_FALLBACK_URL}"
                     loading="lazy">
                 </iframe>
 
@@ -55,10 +84,24 @@ class NavbarComponent extends HTMLElement {
 
         </div>
         `;
+
+        // Update iframe src asynchronously when Supabase responds.
+        getCalendarUrl().then((url) => {
+            try {
+                const iframe = this.querySelector('iframe');
+                if (iframe && url) iframe.src = url;
+            } catch (e) {
+                console.error('Failed to update calendar iframe:', e);
+            }
+        }).catch((e) => console.error('Error getting calendar URL:', e));
     }
 }
 
-customElements.define('custom-navbar', NavbarComponent);
+if (!customElements.get('custom-navbar')) {
+    customElements.define('custom-navbar', NavbarComponent);
+} else {
+    console.debug('custom-navbar already defined');
+}
 
 window.abrirCalendario = function () {
     document

@@ -1,12 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Panel Admin — Lista93</title>
+<title>Panel Admin - Lista93</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="estiloadmin.css">
-
 </head>
 <body>
 
@@ -22,147 +21,105 @@
 <!-- PANTALLA PANEL -->
 <div id="pantalla-panel">
   <div class="panel-header">
-    <h1>📸 Panel de Imágenes</h1>
+    <h1>Panel de Publicaciones</h1>
     <button class="btn-salir" onclick="salir()">Cerrar sesión</button>
   </div>
-  !-- ── SECCIÓN CALENDARIO (agregar dentro de pantalla-panel en admin.html) ── 
 
-<div style="margin-top: 36px; border-top: 1px solid #2a3a4a; padding-top: 28px;">
-  <div class="galeria-titulo">📅 Link del Calendario</div>
- 
-  <div style="display: flex; gap: 10px; align-items: center;">
-    <input
-      type="url"
-      id="input-calendario"
-      class="campo-desc"
-      placeholder="https://calendar.google.com/..."
-      style="flex: 1; margin-bottom: 0;"
-    >
-    <button
-      class="btn"
-      onclick="guardarCalendario()"
-      style="width: auto; padding: 11px 24px; white-space: nowrap;"
-    >
-      Guardar
-    </button>
-  </div>
- 
-  <div id="status-calendario" style="
-    margin-top: 10px; font-size: 13px; font-weight: 700;
-    padding: 8px 12px; border-radius: 6px; display: none;
-  "></div>
-</div>
- 
-<script>
-  // ── Cargar el link actual al abrir el panel ──
-  async function cargarCalendario() {
-    try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/calendario?id=eq.1&select=link`, {
-        headers
-      });
-      const data = await res.json();
-      if (data.length && data[0].link) {
-        document.getElementById('input-calendario').value = data[0].link;
-      }
-    } catch(e) {
-      console.error('Error cargando calendario:', e);
-    }
-  }
- 
-  // ── Guardar el link ──
-  async function guardarCalendario() {
-    const link = document.getElementById('input-calendario').value.trim();
-    const statusEl = document.getElementById('status-calendario');
- 
-    if (!link) {
-      mostrarStatusCal('⚠️ Ingresá un link válido', 'error');
-      return;
-    }
- 
-    try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/calendario?id=eq.1`, {
-        method: 'PATCH',
-        headers: { ...headers, 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ link })
-      });
- 
-      if (!res.ok) throw new Error('Error al guardar');
-      mostrarStatusCal('✅ Link guardado correctamente', 'ok');
- 
-    } catch(e) {
-      mostrarStatusCal('❌ Error al guardar el link', 'error');
-    }
-  }
- 
-  function mostrarStatusCal(msg, tipo) {
-    const el = document.getElementById('status-calendario');
-    el.textContent = msg;
-    el.style.display = 'block';
-    el.style.background = tipo === 'ok' ? '#1a3a2a' : '#3a1a1a';
-    el.style.color = tipo === 'ok' ? '#4ade80' : '#ff6b6b';
-    setTimeout(() => el.style.display = 'none', 3000);
-  }
-</script>
+  <div class="admin-grid">
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <h2>Crear nueva publicación</h2>
+      </div>
+      <div class="admin-card-body">
+        <input type="text" id="input-titulo" class="campo-desc" placeholder="Título de la publicación">
+        <textarea id="input-desc" class="campo-desc" rows="5" placeholder="Descripción"></textarea>
+        <div class="admin-form-row">
+          <input type="date" id="input-fecha" class="campo-desc" readonly>
+        </div>
 
-  <!-- Upload box -->
-  <div class="upload-box" id="upload-box"
-    ondragover="event.preventDefault();this.classList.add('drag-over')"
-    ondragleave="this.classList.remove('drag-over')"
-    ondrop="onDrop(event)">
-    <div class="upload-icon">🖼️</div>
-    <p><strong>Arrastrá una imagen acá</strong><br>o elegila desde tu dispositivo</p>
-    <label class="btn-elegir" for="input-archivo">Elegir imagen</label>
-    <input type="file" id="input-archivo" accept="image/*" onchange="onArchivoElegido(event)">
+        <div class="upload-box" id="upload-box"
+          ondragover="event.preventDefault();this.classList.add('drag-over')"
+          ondragleave="this.classList.remove('drag-over')"
+          ondrop="onDrop(event)">
+          <div class="upload-icon">🖼️</div>
+          <p><strong>Arrastrá una imagen acá</strong><br>o elegila desde tu dispositivo</p>
+          <label class="btn-elegir" for="input-archivo">Elegir imagen</label>
+          <input type="file" id="input-archivo" accept="image/*" onchange="onArchivoElegido(event)">
+        </div>
+
+        <div id="preview-container">
+          <img id="preview-img" src="" alt="preview">
+          <div id="preview-nombre"></div>
+        </div>
+
+        <div id="barra-container">
+          <div id="barra-fondo"><div id="barra-progreso"></div></div>
+          <div id="barra-texto">Subiendo...</div>
+        </div>
+
+        <div id="status-msg"></div>
+
+        <button class="btn" id="btn-subir" onclick="guardarPublicacion()" disabled>Guardar publicación</button>
+      </div>
+    </div>
+
+    <div class="admin-card admin-list-card">
+      <div class="admin-card-header">
+        <h2>Publicaciones vigentes</h2>
+        <div class="admin-pagination" id="pagination-admin"></div>
+      </div>
+      <div id="publicaciones-admin" class="admin-list"></div>
+    </div>
   </div>
 
-  <!-- Preview -->
-  <div id="preview-container">
-    <img id="preview-img" src="" alt="preview">
-    <div id="preview-nombre"></div>
+  <div class="admin-card admin-calendar-card">
+    <div class="admin-card-header">
+      <h2>Calendario</h2>
+    </div>
+    <div class="calendar-card-body">
+      <div class="galeria-titulo">📅 Link del Calendario</div>
+      <div class="admin-form-row" style="margin-top: 10px;">
+        <input
+          type="url"
+          id="input-calendario"
+          class="campo-desc"
+          placeholder="Ingrese link de Google Calendar"
+        >
+        <button class="btn" onclick="guardarCalendario()">Guardar</button>
+      </div>
+      <div id="status-calendario" class="admin-calendar-status"></div>
+    </div>
   </div>
-
-  <!-- Descripción -->
-  <input type="text" id="input-desc" class="campo-desc" placeholder="Descripción (opcional)">
-
-  <!-- Barra de progreso -->
-  <div id="barra-container">
-    <div id="barra-fondo"><div id="barra-progreso"></div></div>
-    <div id="barra-texto">Subiendo...</div>
-  </div>
-
-  <!-- Status -->
-  <div id="status-msg"></div>
-
-  <!-- Botón subir -->
-  <button class="btn" id="btn-subir" onclick="subirImagen()" disabled>Subir imagen</button>
-
-  <!-- Galería -->
-  <div class="galeria-titulo">Imágenes en el carrusel</div>
-  <div class="galeria-grid" id="galeria"></div>
 </div>
 
 <script>
-  // ── CONFIGURACIÓN ──────────────────────────────
   const SUPABASE_URL    = 'https://lnqqmoflqbbgxstxlujy.supabase.co';
   const SUPABASE_KEY    = 'sb_publishable_ehNfp-wrQtIqlDbtNesRww_iFNWR-H3';
   const BUCKET          = 'imagenes';
-  const PASSWORD        = 'admin93';   // ← CAMBIÁ ESTA CONTRASEÑA
+  const PASSWORD        = 'admin93';
+  const PAGE_SIZE       = 10;
 
-  // ── HEADERS ────────────────────────────────────
   const headers = {
     'apikey': SUPABASE_KEY,
     'Authorization': 'Bearer ' + SUPABASE_KEY,
     'Content-Type': 'application/json'
   };
 
-  // ── LOGIN ──────────────────────────────────────
+  let archivoActual = null;
+  let adminPage = 1;
+  let hasNextPage = false;
+
+  function getUruguayDate() {
+    return new Date().toLocaleDateString('sv', { timeZone: 'America/Montevideo' });
+  }
+
   function login() {
     const pass = document.getElementById('input-pass').value;
     if (pass === PASSWORD) {
       document.getElementById('pantalla-login').style.display = 'none';
       document.getElementById('pantalla-panel').style.display = 'block';
-      cargarGaleria();
-      //NUEVO
+      document.getElementById('input-fecha').value = getUruguayDate();
+      cargarPublicaciones();
       cargarCalendario();
     } else {
       document.getElementById('error-login').style.display = 'block';
@@ -174,9 +131,6 @@
     document.getElementById('pantalla-login').style.display = 'block';
     document.getElementById('input-pass').value = '';
   }
-
-  // ── ARCHIVO ELEGIDO ────────────────────────────
-  let archivoActual = null;
 
   function onArchivoElegido(e) {
     const file = e.target.files[0];
@@ -202,81 +156,6 @@
     reader.readAsDataURL(file);
   }
 
-  // ── SUBIR IMAGEN ───────────────────────────────
-  async function subirImagen() {
-    if (!archivoActual) return;
-
-    const btn = document.getElementById('btn-subir');
-    btn.disabled = true;
-    mostrarStatus('', '');
-
-    // Nombre único para el archivo
-    const ext      = archivoActual.name.split('.').pop();
-    const nombre   = Date.now() + '.' + ext;
-    const desc     = document.getElementById('input-desc').value || '';
-
-    // Mostrar barra
-    document.getElementById('barra-container').style.display = 'block';
-    document.getElementById('barra-progreso').style.width = '30%';
-    document.getElementById('barra-texto').textContent = 'Subiendo imagen...';
-
-    try {
-      // 1. Subir al Storage
-      const res = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${nombre}`, {
-        method: 'POST',
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': 'Bearer ' + SUPABASE_KEY,
-          'Content-Type': archivoActual.type,
-          'x-upsert': 'true'
-        },
-        body: archivoActual
-      });
-
-      document.getElementById('barra-progreso').style.width = '70%';
-      document.getElementById('barra-texto').textContent = 'Guardando en base de datos...';
-
-      if (!res.ok) throw new Error('Error al subir la imagen');
-
-      // 2. Obtener URL pública
-      const url = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${nombre}`;
-
-      // 3. Guardar URL en la tabla fotos
-      const res2 = await fetch(`${SUPABASE_URL}/rest/v1/fotos`, {
-        method: 'POST',
-        headers: { ...headers, 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ url, descripcion: desc })
-      });
-
-      if (!res2.ok) throw new Error('Error al guardar en base de datos');
-
-      document.getElementById('barra-progreso').style.width = '100%';
-      document.getElementById('barra-texto').textContent = '¡Listo!';
-
-      setTimeout(() => {
-        document.getElementById('barra-container').style.display = 'none';
-        document.getElementById('barra-progreso').style.width = '0%';
-      }, 800);
-
-      mostrarStatus('✅ Imagen subida correctamente', 'ok');
-      limpiarForm();
-      cargarGaleria();
-
-    } catch (err) {
-      document.getElementById('barra-container').style.display = 'none';
-      mostrarStatus('❌ Error: ' + err.message, 'error');
-      btn.disabled = false;
-    }
-  }
-
-  function limpiarForm() {
-    archivoActual = null;
-    document.getElementById('input-archivo').value = '';
-    document.getElementById('input-desc').value = '';
-    document.getElementById('preview-container').style.display = 'none';
-    document.getElementById('btn-subir').disabled = true;
-  }
-
   function mostrarStatus(msg, tipo) {
     const el = document.getElementById('status-msg');
     el.textContent = msg;
@@ -284,57 +163,258 @@
     el.style.display = msg ? 'block' : 'none';
   }
 
-  // ── CARGAR GALERÍA ─────────────────────────────
-  async function cargarGaleria() {
-    const grid = document.getElementById('galeria');
-    grid.innerHTML = '<div class="galeria-vacia">Cargando...</div>';
-    try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/fotos?select=*&order=created_at.desc`, { headers });
-      const fotos = await res.json();
+  function limpiarForm() {
+    archivoActual = null;
+    document.getElementById('input-archivo').value = '';
+    document.getElementById('input-titulo').value = '';
+    document.getElementById('input-desc').value = '';
+    document.getElementById('preview-container').style.display = 'none';
+    document.getElementById('btn-subir').disabled = true;
+    document.getElementById('input-fecha').value = getUruguayDate();
+  }
 
-      if (!fotos.length) {
-        grid.innerHTML = '<div class="galeria-vacia">No hay imágenes todavía</div>';
+  async function subirArchivo() {
+    const file = archivoActual;
+    if (!file) return null;
+
+    const ext = file.name.split('.').pop();
+    const nombre = Date.now() + '.' + ext;
+
+    document.getElementById('barra-container').style.display = 'block';
+    document.getElementById('barra-progreso').style.width = '30%';
+    document.getElementById('barra-texto').textContent = 'Subiendo imagen...';
+
+    const res = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${nombre}`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': file.type,
+        'x-upsert': 'true'
+      },
+      body: file
+    });
+
+    if (!res.ok) throw new Error('Error al subir la imagen');
+
+    document.getElementById('barra-progreso').style.width = '70%';
+    document.getElementById('barra-texto').textContent = 'Generando URL...';
+
+    return `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${nombre}`;
+  }
+
+  async function guardarPublicacion() {
+    const titulo = document.getElementById('input-titulo').value.trim();
+    const descripcion = document.getElementById('input-desc').value.trim();
+    const fecha = getUruguayDate();
+    const idfoto = 'IMG-' + Date.now();
+    let urlFoto = null;
+
+    if (!titulo) {
+      mostrarStatus('⚠️ Ingresá un título', 'error');
+      return;
+    }
+
+    try {
+      if (archivoActual) {
+        urlFoto = await subirArchivo();
+      } else {
+        mostrarStatus('⚠️ Seleccioná una imagen para la publicación', 'error');
         return;
       }
 
-      grid.innerHTML = fotos.map(f => `
-        <div class="galeria-item" id="item-${f.id}">
-          <img src="${f.url}" alt="${f.descripcion || ''}">
-          <button class="btn-borrar" onclick="borrarFoto(${f.id}, '${f.url}')" title="Borrar">✕</button>
-          <div class="galeria-item-info">
-            <div class="galeria-item-desc">${f.descripcion || 'Sin descripción'}</div>
-          </div>
-        </div>
-      `).join('');
-    } catch(e) {
-      grid.innerHTML = '<div class="galeria-vacia">Error al cargar imágenes</div>';
+      if (!urlFoto) {
+        mostrarStatus('⚠️ No se pudo generar la URL de la imagen', 'error');
+        return;
+      }
+
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/publicacion`, {
+        method: 'POST',
+        headers: { ...headers, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({
+          titulo,
+          IDfoto: idfoto,
+          descripcion: descripcion || null,
+          fecha,
+          UrlFoto: urlFoto
+        })
+      });
+
+      if (!res.ok) throw new Error('Error al guardar la publicación');
+
+      mostrarStatus('✅ Publicación guardada correctamente', 'ok');
+      limpiarForm();
+      cargarPublicaciones(adminPage);
+    } catch (err) {
+      document.getElementById('barra-container').style.display = 'none';
+      mostrarStatus('❌ ' + err.message, 'error');
+    } finally {
+      setTimeout(() => {
+        document.getElementById('barra-container').style.display = 'none';
+        document.getElementById('barra-progreso').style.width = '0%';
+      }, 800);
     }
   }
 
-  // ── BORRAR FOTO ────────────────────────────────
-  async function borrarFoto(id, url) {
-    if (!confirm('¿Borrar esta imagen?')) return;
+  function formatDate(value) {
+    if (!value) return '';
+    return new Date(value).toLocaleDateString('es-UY', {
+      day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'America/Montevideo'
+    });
+  }
+
+  function escapeHtml(text) {
+    return text
+      ? text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;')
+      : '';
+  }
+
+  function toggleDescripcion(id) {
+    const descEl = document.getElementById('admin-desc-' + id);
+    const btn = document.getElementById('admin-toggle-' + id);
+    if (!descEl || !btn) return;
+
+    const full = descEl.dataset.full || '';
+    const expanded = descEl.dataset.expanded === 'true';
+
+    if (expanded) {
+      descEl.textContent = full.slice(0, 100) + (full.length > 100 ? '...' : '');
+      descEl.dataset.expanded = 'false';
+      btn.textContent = 'Ver más';
+    } else {
+      descEl.textContent = full;
+      descEl.dataset.expanded = 'true';
+      btn.textContent = 'Mostrar menos';
+    }
+  }
+
+  function renderPagination(page, next) {
+    const wrapper = document.getElementById('pagination-admin');
+    wrapper.innerHTML = `
+      <button class="pagination-button" onclick="cargarPublicaciones(${page - 1})" ${page === 1 ? 'disabled' : ''}>Anterior</button>
+      <span>Página ${page}</span>
+      <button class="pagination-button" onclick="cargarPublicaciones(${page + 1})" ${!next ? 'disabled' : ''}>Siguiente</button>
+    `;
+  }
+
+  async function cargarPublicaciones(page = 1) {
+    adminPage = page;
+    const hoy = getUruguayDate();
+    const offset = (page - 1) * PAGE_SIZE;
+    const grid = document.getElementById('publicaciones-admin');
+    grid.innerHTML = '<div class="galeria-vacia">Cargando publicaciones...</div>';
+
     try {
-      // Extraer nombre del archivo de la URL
-      const nombre = url.split('/').pop();
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/publicacion?select=*&fecha=lte.${hoy}&order=fecha.desc,id.desc&limit=${PAGE_SIZE + 1}&offset=${offset}`, { headers });
+      const publicaciones = await res.json();
+      hasNextPage = publicaciones.length > PAGE_SIZE;
+      if (hasNextPage) publicaciones.pop();
 
-      // Borrar del Storage
-      await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${nombre}`, {
-        method: 'DELETE',
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-      });
+      if (!publicaciones.length) {
+        grid.innerHTML = '<div class="galeria-vacia">No hay publicaciones disponibles</div>';
+      } else {
+        grid.innerHTML = publicaciones.map(p => `
+          <div class="admin-item" id="item-${p.id}">
+            <div class="admin-item-media">
+              <img src="${p.UrlFoto || 'Imagenes/logo_fondo.png'}" alt="${escapeHtml(p.titulo || 'Publicación')}">
+            </div>
+            <div class="admin-item-main">
+              <div class="admin-item-header">
+                <div>
+                  <div class="admin-item-title">${escapeHtml(p.titulo)}</div>
+                  <div class="admin-item-meta">${formatDate(p.fecha)} · ID: ${escapeHtml(p.IDfoto || '-')}</div>
+                </div>
+                <button class="btn-borrar" onclick="borrarPublicacion(${p.id}, '${p.UrlFoto || ''}')" title="Borrar">✕</button>
+              </div>
+              <div class="admin-item-desc" id="admin-desc-${p.id}" data-full="${escapeHtml(p.descripcion || '')}" data-expanded="false">
+                ${escapeHtml((p.descripcion || '').slice(0, 100))}${(p.descripcion || '').length > 100 ? '...' : ''}
+              </div>
+              ${p.descripcion && p.descripcion.length > 100 ? `<button class="toggle-btn" id="admin-toggle-${p.id}" onclick="toggleDescripcion(${p.id})">Ver más</button>` : ''}
+            </div>
+          </div>
+        `).join('');
+      }
+    } catch (e) {
+      grid.innerHTML = '<div class="galeria-vacia">Error al cargar publicaciones</div>';
+    }
 
-      // Borrar de la base de datos
-      await fetch(`${SUPABASE_URL}/rest/v1/fotos?id=eq.${id}`, {
+    renderPagination(page, hasNextPage);
+  }
+
+  async function borrarPublicacion(id, url) {
+    if (!confirm('¿Borrar esta publicación?')) return;
+
+    try {
+      if (url) {
+        const nombre = url.split('/').pop().split('?')[0];
+        if (nombre) {
+          await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${nombre}`, {
+            method: 'DELETE',
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+          });
+        }
+      }
+
+      await fetch(`${SUPABASE_URL}/rest/v1/publicacion?id=eq.${id}`, {
         method: 'DELETE',
         headers
       });
 
       document.getElementById('item-' + id)?.remove();
-      mostrarStatus('🗑️ Imagen borrada', 'ok');
-    } catch(e) {
+      mostrarStatus('🗑️ Publicación borrada', 'ok');
+      cargarPublicaciones(adminPage);
+    } catch (e) {
       mostrarStatus('❌ Error al borrar', 'error');
     }
+  }
+
+  async function cargarCalendario() {
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/calendario?id=eq.1&select=link`, { headers });
+      const data = await res.json();
+      if (data.length && data[0].link) {
+        document.getElementById('input-calendario').value = data[0].link;
+      }
+    } catch (e) {
+      console.error('Error cargando calendario:', e);
+    }
+  }
+
+  async function guardarCalendario() {
+    const link = document.getElementById('input-calendario').value.trim();
+    if (!link || !/^(https:\/\/calendar\.google\.com|https:\/\/www\.google\.com\/calendar)/.test(link)) {
+      mostrarStatusCal('⚠️ Pegá un link válido de Google Calendar que comience con https://calendar.google.com o https://www.google.com/calendar', 'error');
+      return;
+    }
+
+    try {
+      const payload = { link };
+
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/calendario?id=eq.1`, {
+        method: 'PATCH',
+        headers: { ...headers, 'Prefer': 'return=minimal' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Error al guardar: ${res.status} ${errorText}`);
+      }
+
+      mostrarStatusCal('✅ Link guardado correctamente', 'ok');
+    } catch (e) {
+      console.error('Error guardando calendario:', e);
+      mostrarStatusCal('❌ Error al guardar el link', 'error');
+    }
+  }
+
+  function mostrarStatusCal(msg, tipo) {
+    const el = document.getElementById('status-calendario');
+    el.textContent = msg;
+    el.style.display = 'block';
+    el.style.background = tipo === 'ok' ? '#1a3a2a' : '#3a1a1a';
+    el.style.color = tipo === 'ok' ? '#4ade80' : '#ff6b6b';
+    setTimeout(() => el.style.display = 'none', 3000);
   }
 </script>
 </body>

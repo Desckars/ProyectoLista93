@@ -40,9 +40,8 @@
 <!-- CARRUSEL DINÁMICO -->
 <div class="carousel" id="carousel">
   <div class="carousel-track" id="track">
-    <!-- Las fotos se cargan desde Supabase automáticamente -->
     <div class="carousel-slide slide-1">
-      <span class="slide-label" id="cargando-label">Cargando fotos...</span>
+      <span class="slide-label" id="cargando-label">Cargando publicaciones...</span>
     </div>
   </div>
 
@@ -62,6 +61,14 @@
 
   <div class="carousel-dots" id="dots"></div>
 </div>
+
+<section class="publicaciones-section">
+  <div class="section-header">
+    <h2>Últimas publicaciones</h2>
+    <div class="publicaciones-pagination" id="pagination"></div>
+  </div>
+  <div class="publicaciones-list" id="publicaciones-list"></div>
+</section>
 
 <!-- FOOTER -->
 <footer>
@@ -91,16 +98,48 @@
 </footer>
 
 <script>
-  // ── SUPABASE CONFIG ──────────────────────────
   const SUPABASE_URL = 'https://lnqqmoflqbbgxstxlujy.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_ehNfp-wrQtIqlDbtNesRww_iFNWR-H3';
 
-  // ── CARRUSEL ─────────────────────────────────
-  const track  = document.getElementById('track');
+  const headers = {
+    'apikey': SUPABASE_KEY,
+    'Authorization': 'Bearer ' + SUPABASE_KEY
+  };
+
+  const track = document.getElementById('track');
   const dotsEl = document.getElementById('dots');
+  const publicacionesList = document.getElementById('publicaciones-list');
+  const paginationEl = document.getElementById('pagination');
   let actual = 0;
-  let total  = 1;
+  let total = 1;
   let intervalo;
+  let currentPage = 1;
+  const PAGE_SIZE = 10;
+
+  function getUruguayDate() {
+    return new Date().toLocaleDateString('sv', { timeZone: 'America/Montevideo' });
+  }
+
+  function formatDate(value) {
+    if (!value) return '';
+    return new Date(value).toLocaleDateString('es-UY', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      timeZone: 'America/Montevideo'
+    });
+  }
+
+  function escapeHtml(text) {
+    return text
+      ? String(text)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;')
+      : '';
+  }
 
   function crearDot(i) {
     const d = document.createElement('button');
@@ -132,74 +171,145 @@
     intervalo = setInterval(() => mover(1), 4000);
   }
 
-  // ── CARGAR FOTOS DESDE SUPABASE ───────────────
-  async function cargarFotos() {
+  function crearSlideHtml(publicacion) {
+    return `
+      <div class="carousel-slide">
+        <a class="slide-card" href="publicacion.html?id=${publicacion.id}">
+          <img src="${publicacion.UrlFoto || 'Imagenes/logo_fondo.png'}" alt="${escapeHtml(publicacion.titulo || 'Publicación')}">
+          <div class="slide-copy">
+            <h3 class="slide-title">${escapeHtml(publicacion.titulo || 'Sin título')}</h3>
+            <p class="slide-snippet">${escapeHtml(publicacion.descripcion || '').slice(0, 100)}...</p>
+            <span class="slide-link">Leer publicación</span>
+          </div>
+        </a>
+      </div>`;
+  }
+
+  function crearCardHtml(publicacion) {
+    const descripcion = publicacion.descripcion || 'Sin descripción disponible.';
+    const snippet = descripcion.length > 100 ? descripcion.slice(0, 100) : descripcion;
+    const necesitaToggle = descripcion.length > 100;
+    const id = publicacion.id;
+
+    return `
+      <article class="publicacion-card">
+        <img src="${publicacion.UrlFoto || 'Imagenes/logo_fondo.png'}" alt="${escapeHtml(publicacion.titulo || 'Publicación')}">
+        <div class="publicacion-card-body">
+          <div class="publicacion-card-meta">${formatDate(publicacion.fecha)}${publicacion.IDfoto ? ' · ' + escapeHtml(publicacion.IDfoto) : ''}</div>
+          <h3 class="publicacion-card-title">${escapeHtml(publicacion.titulo || 'Sin título')}</h3>
+          <p class="publicacion-card-text">
+            <span id="descripcion-preview-${id}">${escapeHtml(snippet)}</span>
+            ${necesitaToggle ? `<span id="descripcion-full-${id}" class="descripcion-full" style="display:none;">${escapeHtml(descripcion.slice(100))}</span>` : ''}
+            ${necesitaToggle ? `<button type="button" class="descripcion-toggle" onclick="toggleDescripcion('${id}')">Ver más</button>` : ''}
+          </p>
+          <a class="btn slide-link" href="publicacion.html?id=${id}">Ver publicación</a>
+        </div>
+      </article>`;
+  }
+
+  function renderPagination(page, totalPages) {
+    paginationEl.innerHTML = '';
+    if (totalPages <= 1) {
+      return;
+    }
+
+    const prev = document.createElement('button');
+    prev.textContent = 'Anterior';
+    prev.className = 'pagination-button';
+    prev.disabled = page === 1;
+    prev.addEventListener('click', () => cargarPublicaciones(page - 1));
+    paginationEl.appendChild(prev);
+
+    for (let i = 1; i <= totalPages; i += 1) {
+      const btn = document.createElement('button');
+      btn.textContent = String(i);
+      btn.className = 'pagination-button';
+      btn.disabled = i === page;
+      btn.addEventListener('click', () => cargarPublicaciones(i));
+      paginationEl.appendChild(btn);
+    }
+
+    const next = document.createElement('button');
+    next.textContent = 'Siguiente';
+    next.className = 'pagination-button';
+    next.disabled = page === totalPages;
+    next.addEventListener('click', () => cargarPublicaciones(page + 1));
+    paginationEl.appendChild(next);
+  }
+
+  function toggleDescripcion(id) {
+    const preview = document.getElementById(`descripcion-preview-${id}`);
+    const full = document.getElementById(`descripcion-full-${id}`);
+    const button = preview?.parentElement.querySelector('.descripcion-toggle');
+    if (!preview || !full || !button) return;
+
+    const showing = full.style.display === 'inline';
+    full.style.display = showing ? 'none' : 'inline';
+    button.textContent = showing ? 'Ver más' : 'Ver menos';
+  }
+
+  async function cargarPublicaciones(page = 1) {
+    currentPage = page;
+    const offset = (page - 1) * PAGE_SIZE;
+    const today = getUruguayDate();
+
     try {
       const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/fotos?select=*&order=created_at.desc`,
-        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
+        `${SUPABASE_URL}/rest/v1/publicacion?select=*&fecha=lte.${today}&order=fecha.desc,id.desc&limit=${PAGE_SIZE}&offset=${offset}`,
+        { headers: { ...headers, 'Prefer': 'count=exact' } }
       );
-      const fotos = await res.json();
+      const publicaciones = await res.json();
+      const contentRange = res.headers.get('content-range');
+      const totalItems = contentRange ? parseInt(contentRange.split('/')[1], 10) || publicaciones.length : publicaciones.length;
+      const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
 
-      if (!fotos.length) {
-        // Sin fotos: mostrar placeholder
-        track.innerHTML = `
-          <div class="carousel-slide slide-1">
-            <span class="slide-label">Sin fotos aún</span>
-          </div>`;
-        total = 1;
-        dotsEl.innerHTML = '';
-        crearDot(0);
-        return;
-      }
+      publicacionesList.innerHTML = publicaciones.length
+        ? publicaciones.map(crearCardHtml).join('')
+        : '<div class="publicaciones-vacias">No hay publicaciones para mostrar en este momento.</div>';
 
-      // Construir slides
-      track.innerHTML = fotos.map(f => `
-        <div class="carousel-slide">
-          <img src="${f.url}" alt="${f.descripcion || 'foto'}">
-        </div>
-      `).join('');
+      renderPagination(page, totalPages);
 
-      total = fotos.length;
+      const carouselPublicaciones = publicaciones.slice(0, 5);
+      track.innerHTML = carouselPublicaciones.length
+        ? carouselPublicaciones.map(crearSlideHtml).join('')
+        : '<div class="carousel-slide slide-1"><span class="slide-label">No hay publicaciones activas.</span></div>';
+
+      total = carouselPublicaciones.length || 1;
       actual = 0;
       dotsEl.innerHTML = '';
-      fotos.forEach((_, i) => crearDot(i));
+      Array.from({ length: total }).forEach((_, i) => crearDot(i));
       actualizar();
       iniciarAutoplay();
-
-    } catch(e) {
-      console.error('Error cargando fotos:', e);
+    } catch (e) {
+      console.error('Error cargando publicaciones:', e);
+      publicacionesList.innerHTML = '<div class="publicaciones-vacias">Error al cargar publicaciones. Intenta de nuevo más tarde.</div>';
+      track.innerHTML = '<div class="carousel-slide slide-1"><span class="slide-label">Error al cargar publicaciones.</span></div>';
+      dotsEl.innerHTML = '';
+      crearDot(0);
     }
   }
 
-  cargarFotos();
+  cargarPublicaciones();
 
   // ==================== SPLASH SCREEN LOGIC ====================
-const splash = document.getElementById('splash');
+  const splash = document.getElementById('splash');
 
-function showSplash() {
-  // Si ya se mostró en esta sesión, saltar
-  if (sessionStorage.getItem('splashShown') === 'true') {
-    splash.style.display = 'none';
-    return;
+  function showSplash() {
+    if (sessionStorage.getItem('splashShown') === 'true') {
+      splash.style.display = 'none';
+      return;
+    }
+
+    sessionStorage.setItem('splashShown', 'true');
+    setTimeout(() => {
+      splash.classList.add('move-to-header');
+      setTimeout(() => {
+        splash.classList.add('hidden');
+      }, 1800);
+    }, 5200);
   }
 
-  // Marcar que ya se mostró
-  sessionStorage.setItem('splashShown', 'true');
-
-  // Después de que termine de girar (5 segundos), mover al header
-  setTimeout(() => {
-    splash.classList.add('move-to-header');
-
-    // Ocultar splash completamente después del movimiento
-    setTimeout(() => {
-      splash.classList.add('hidden');
-    }, 1800);
-  }, 5200);
-}
-
-window.onload = showSplash;
-
+  window.onload = showSplash;
 </script>
 </body>
 </html>

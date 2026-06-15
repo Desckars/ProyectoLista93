@@ -20,7 +20,7 @@ class NavbarComponent extends HTMLElement {
 
             <ul class="nav-links">
                 <li><a href="index.html">Inicio</a></li>
-                <li><a href="conocenos.html">Conócenos</a></li>
+                <li><a href="conocenos.html">Conocénos</a></li>
                 <li><a href="que_hacemos.html">Qué Hacemos</a></li>
 
                 <li>

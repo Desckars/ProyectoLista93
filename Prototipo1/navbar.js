@@ -47,6 +47,12 @@ class NavbarComponent extends HTMLElement {
                 </div>
             </div>
 
+            <button class="hamburguesa" id="hamburguesa">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
             <ul class="nav-links">
                 <li><a href="index.html">Inicio</a></li>
                 <li><a href="conocenos.html">Conocénos</a></li>
@@ -58,6 +64,25 @@ class NavbarComponent extends HTMLElement {
                     </a>
                 </li>
             </ul>
+
+            <div class="menu-lateral" id="menuLateral">
+
+                <button class="cerrar-menu" id="cerrarMenu">
+                    ✕
+                </button>
+
+                <a href="index.html">Inicio</a>
+                <a href="conocenos.html">Conócenos</a>
+                <a href="que_hacemos.html">Qué Hacemos</a>
+
+                <a href="#"
+                onclick="abrirCalendario(); return false;">
+                    Calendario
+                </a>
+
+            </div>
+
+            <div class="overlay-menu" id="overlayMenu"></div>
         </nav>
 
         <!-- MODAL CALENDARIO -->
@@ -94,6 +119,26 @@ class NavbarComponent extends HTMLElement {
                 console.error('Failed to update calendar iframe:', e);
             }
         }).catch((e) => console.error('Error getting calendar URL:', e));
+
+        const hamburguesa = this.querySelector('#hamburguesa');
+        const menuLateral = this.querySelector('#menuLateral');
+        const cerrarMenu = this.querySelector('#cerrarMenu');
+        const overlayMenu = this.querySelector('#overlayMenu');
+
+        hamburguesa?.addEventListener('click', () => {
+            menuLateral.classList.add('abierto');
+            overlayMenu.classList.add('activo');
+        });
+
+        cerrarMenu?.addEventListener('click', () => {
+            menuLateral.classList.remove('abierto');
+            overlayMenu.classList.remove('activo');
+        });
+
+        overlayMenu?.addEventListener('click', () => {
+            menuLateral.classList.remove('abierto');
+            overlayMenu.classList.remove('activo');
+        });
     }
 }
 

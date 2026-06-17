@@ -59,7 +59,8 @@ class NavbarComponent extends HTMLElement {
                 <li><a href="que_hacemos.html">Qué Hacemos</a></li>
 
                 <li>
-                    <a href="#" onclick="abrirCalendario(); return false;">
+                    <a href="#"
+                    onclick="cerrarMenuLateral(); abrirCalendario(); return false;">
                         Calendario
                     </a>
                 </li>
@@ -76,7 +77,7 @@ class NavbarComponent extends HTMLElement {
                 <a href="que_hacemos.html">Qué Hacemos</a>
 
                 <a href="#"
-                onclick="abrirCalendario(); return false;">
+                onclick="cerrarMenuLateral(); abrirCalendario(); return false;">
                     Calendario
                 </a>
 
@@ -139,6 +140,11 @@ class NavbarComponent extends HTMLElement {
             menuLateral.classList.remove('abierto');
             overlayMenu.classList.remove('activo');
         });
+
+        window.cerrarMenuLateral = function () {
+            menuLateral.classList.remove('abierto');
+            overlayMenu.classList.remove('activo');
+        };
     }
 }
 

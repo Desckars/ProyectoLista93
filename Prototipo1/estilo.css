@@ -895,3 +895,118 @@ footer {
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.15);
 }
+
+/* ─────────────────────────────────────────
+   MENÚ HAMBURGUESA MÓVIL / NAVBAR CELULAR 
+───────────────────────────────────────── */
+
+.hamburguesa {
+    display: none;
+    margin-left: auto;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.hamburguesa span {
+    display: block;
+    width: 28px;
+    height: 3px;
+    background: var(--azul);
+    margin: 5px 0;
+    border-radius: 2px;
+}
+
+.menu-lateral {
+  position: fixed;
+  top: 0;
+  right: -300px;
+
+  width: 280px;
+  height: 100vh;
+
+  background: white;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 20px;
+
+  padding: 80px 25px;
+
+  box-shadow: -5px 0 20px rgba(0,0,0,.25);
+
+  transition: right .3s ease;
+
+  z-index: 99999;
+}
+
+.menu-lateral.abierto {
+  right: 0;
+}
+
+.menu-lateral a {
+  color: var(--azul);
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+
+.menu-lateral a:hover {
+  color: var(--azul-oscuro);
+}
+
+.cerrar-menu {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+
+  background: none;
+  border: none;
+
+  font-size: 30px;
+  cursor: pointer;
+}
+
+.overlay-menu {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0,0,0,.45);
+
+  opacity: 0;
+  visibility: hidden;
+
+  transition: .3s;
+
+  z-index: 99998;
+}
+
+.overlay-menu.activo {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* SOLO EN CELULAR */
+
+@media (max-width: 768px) {
+
+  .nav-links {
+      display: none;
+  }
+
+  .hamburguesa {
+      display: block;
+  }
+
+  .nav-nombre {
+      font-size: 14px;
+  }
+
+  .nav-sub {
+      font-size: 10px;
+  }
+
+}

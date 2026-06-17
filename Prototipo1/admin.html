@@ -174,7 +174,7 @@
       }
 
       // Login exitoso
-      puedeEditar = data.editar === true;
+      puedeEditar = data.editar === true || data.editar === 'true' || data.editar === 'TRUE';
 
       document.getElementById('pantalla-login').style.display  = 'none';
       document.getElementById('pantalla-panel').style.display  = 'block';

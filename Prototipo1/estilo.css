@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800;900&display=swap');
+
 /* ─────────────────────────────
    RESET
 ───────────────────────────── */
@@ -20,7 +22,7 @@
    BASE
 ───────────────────────────── */
 body {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Rubik', sans-serif;
   background: var(--blanco);
   color: var(--azul-oscuro);
 }
@@ -144,9 +146,9 @@ body:not(:has(.splash)) custom-navbar .nav-logo-wrapper {
 
 .nav-links a {
   color: var(--azul);
-  text-decoration: underline;
+  text-decoration: none;
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 900;
   letter-spacing: .06em;
   text-transform: uppercase;
 }
@@ -156,12 +158,8 @@ body:not(:has(.splash)) custom-navbar .nav-logo-wrapper {
 }
 
 /* ─────────────────────────────
-   CALENDAR MODAL
-───────────────────────────── */
-/* ─────────────────────────────
    MODAL CALENDARIO
 ───────────────────────────── */
-
 .calendar-modal {
     position: fixed;
     inset: 0;

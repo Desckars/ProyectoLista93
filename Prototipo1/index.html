@@ -24,51 +24,69 @@
 <!-- NAVBAR -->
 <custom-navbar></custom-navbar>
 
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-placeholder"></div>
-  <div class="hero-lema">Vanguardia del Ceibo</div>
-</div>
+  <!-- 1. AQUÍ EMPIEZA EL CONTENEDOR GLOBAL (EL QUE MANEJA LAS DOS COLUMNAS) -->
+<div class="pagina-contenedor">
 
-<!-- SECCIÓN INFO -->
-<section class="info-section">
-  <p class="descripción-texto">
-    Sómos un grupo con muchas ganas de crecer y ayudar participado en diversas actividades para el bienestar de las personas.
-  </p>
-</section>
-
-<!-- CARRUSEL DINÁMICO -->
-<div class="carousel" id="carousel">
-  <div class="carousel-track" id="track">
-    <div class="carousel-slide slide-1">
-      <span class="slide-label" id="cargando-label">Cargando publicaciones...</span>
+  <!-- 2. AQUÍ ENTRA LA COLUMNA DE LA IZQUIERDA (TODO ESTO VA ADENTRO) -->
+  <main class="contenido-principal">
+    
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-placeholder"></div>
+      <div class="hero-lema">Vanguardia del Ceibo</div>
     </div>
-  </div>
 
-  <button class="carousel-btn prev" onclick="mover(-1)" aria-label="Anterior">
-    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"
-         stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="15 18 9 12 15 6"/>
-    </svg>
-  </button>
+    <!-- Sección Info -->
+    <div class="layout-principal">
+      <section class="info-section">
+        <p class="descripción-texto">
+          Sómos un grupo con muchas ganas de crecer y ayudar participado en diversas actividades para el bienestar de las personas.
+        </p>
+      </section>
+    </div>
 
-  <button class="carousel-btn next" onclick="mover(1)" aria-label="Siguiente">
-    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"
-         stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="9 18 15 12 9 6"/>
-    </svg>
-  </button>
+    <!-- Carrusel Dinámico -->
+    <div class="carousel" id="carousel">
+      <div class="carousel-track" id="track">
+        <div class="carousel-slide slide-1">
+          <span class="slide-label" id="cargando-label">Cargando publicaciones...</span>
+        </div>
+      </div>
 
-  <div class="carousel-dots" id="dots"></div>
+      <button class="carousel-btn prev" onclick="mover(-1)" aria-label="Anterior">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+
+      <button class="carousel-btn next" onclick="mover(1)" aria-label="Siguiente">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
+
+      <div class="carousel-dots" id="dots"></div>
+    </div>
+
+    <!-- Sección Últimas Publicaciones -->
+    <section class="publicaciones-section">
+      <div class="section-header">
+        <h2>Últimas publicaciones</h2>
+        <div class="publicaciones-pagination" id="pagination"></div>
+      </div>
+      <div class="publicaciones-list" id="publicaciones-list"></div>
+    </section>
+
+  </main> 
+  
+  <aside class="sidebar-noticias">
+    <div class="sidebar-titulo">Últimas Noticias</div>
+    <div id="noticias-contenedor" class="noticias-lista">
+      <div class="noticia-cargando">Cargando noticias...</div>
+    </div>
+  </aside>
+
 </div>
-
-<section class="publicaciones-section">
-  <div class="section-header">
-    <h2>Últimas publicaciones</h2>
-    <div class="publicaciones-pagination" id="pagination"></div>
-  </div>
-  <div class="publicaciones-list" id="publicaciones-list"></div>
-</section>
 
 <!-- FOOTER -->
 <footer>
@@ -289,8 +307,53 @@
     }
   }
 
-  cargarPublicaciones();
+  // ── CARGAR NOTICIAS EN LA SIDEBAR DERECHA ──
+  async function cargarNoticiasSidebar() {
+    const contenedor = document.getElementById('noticias-contenedor');
+    if (!contenedor) return; // Salvaguarda por si se usa en páginas sin sidebar
 
+    try {
+      const hoy = getUruguayDate();
+      
+      // Hacemos el fetch pidiendo solo los posts donde es_noticia sea true
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/publicacion?select=id,titulo,fecha,es_noticia&es_noticia=eq.true&fecha=lte.${hoy}&order=fecha.desc,id.desc&limit=5`,
+        { headers }
+      );
+      
+      if (!res.ok) {
+        throw new Error('Error en la respuesta de Supabase');
+      }
+
+      const noticias = await res.json();
+
+      // Si no hay ninguna noticia marcada
+      if (!noticias || noticias.length === 0) {
+        contenedor.innerHTML = '<div class="noticia-vacia">No hay noticias recientes.</div>';
+        return;
+      }
+
+      // Renderizamos las noticias encontradas
+      contenedor.innerHTML = noticias.map(n => {
+        return `
+          <article class="noticia-item">
+            <span class="noticia-item-fecha">📅 ${formatDate(n.fecha)}</span>
+            <a class="noticia-item-titulo" href="publicacion.html?id=${n.id}">
+              ${escapeHtml(n.titulo)}
+            </a>
+          </article>
+        `;
+      }).join('');
+
+    } catch (error) {
+      console.error('Error cargando noticias:', error);
+      // Evitamos romper la ejecución y mostramos un estado amigable
+      contenedor.innerHTML = '<div class="noticia-vacia">No hay noticias disponibles.</div>';
+    }
+  }
+
+  cargarPublicaciones();
+  cargarNoticiasSidebar();
   // ==================== SPLASH SCREEN LOGIC ====================
   const splash = document.getElementById('splash');
 

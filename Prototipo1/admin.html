@@ -55,7 +55,12 @@
         <div class="admin-form-row">
           <input type="date" id="input-fecha" class="campo-desc" readonly>
         </div>
-
+        <div style="margin: 15px 0; display: flex; align-items: center; gap: 8px;">
+          <input type="checkbox" id="input-es-noticia" style="width: 18px; height: 18px; cursor: pointer;">
+          <label for="input-es-noticia" style="font-size: 14px; font-weight: 700; color: #e2e8f0; cursor: pointer;">
+            Marcar como Noticia (irá a la barra lateral)
+          </label>
+        </div>
         <div class="upload-box" id="upload-box"
           ondragover="event.preventDefault();this.classList.add('drag-over')"
           ondragleave="this.classList.remove('drag-over')"
@@ -283,6 +288,7 @@
     document.getElementById('input-archivo').value   = '';
     document.getElementById('input-titulo').value    = '';
     document.getElementById('input-desc').value      = '';
+    document.getElementById('input-es-noticia').checked = false;
     document.getElementById('preview-container').style.display = 'none';
     document.getElementById('btn-subir').disabled    = true;
     document.getElementById('input-fecha').value     = getUruguayDate();
@@ -324,6 +330,7 @@
 
     const titulo      = document.getElementById('input-titulo').value.trim();
     const descripcion = document.getElementById('input-desc').value.trim();
+    const esNoticia   = document.getElementById('input-es-noticia').checked; 
     const fecha       = getUruguayDate();
     const idfoto      = 'IMG-' + Date.now();
     let   urlFoto     = null;
@@ -342,6 +349,7 @@
           titulo,
           IDfoto: idfoto,
           descripcion: descripcion || null,
+          es_noticia: esNoticia,
           fecha,
           url_foto: urlFoto
         })

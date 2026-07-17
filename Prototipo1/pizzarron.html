@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pizzarón</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="pizzarron.css">
+</head>
+<body>
+
+<div class="pizzarron-wrapper">
+
+  <!-- CONTROLES DE ZOOM -->
+  <div class="zoom-controls">
+    <button class="zoom-btn" id="btn-zoom-in"  onclick="cambiarZoom(1)">＋</button>
+    <span   class="zoom-label" id="zoom-label">100%</span>
+    <button class="zoom-btn" id="btn-zoom-out" onclick="cambiarZoom(-1)">－</button>
+  </div>
+
+  <!-- PIZZARÓN -->
+  <div class="pizzarron-outer">
+    <div class="pizzarron-board" id="board">
+      <div class="pizzarron-inner" id="inner">
+        <!-- Las fotos se insertan acá dinámicamente -->
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://lnqqmoflqbbgxstxlujy.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_ehNfp-wrQtIqlDbtNesRww_iFNWR-H3';
+
+  // ── DIMENSIONES DEL PIZZARÓN ──────────────────────
+  const BOARD_W = 1200;
+  const BOARD_H = 800;
+
+  // Tamaño base de cada foto (se va achicando cuando se llena)
+  let escalaFotos = 1.0;
+  const ESCALA_MIN = 0.25; // nunca más chico que 25%
+  const ESCALA_PASO = 0.15; // cuánto se achica cada vez que se llena
+
+  // Tamaño base de imagen (antes de escala)
+  const IMG_BASE_W = 180;
+  const IMG_BASE_H = 140;
+  const MARGEN     = 8; // espacio entre fotos
+
+  // ── ZOOM DEL BOARD ────────────────────────────────
+  const ZOOM_PASOS = [0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.4, 1.6];
+  let zoomIdx = 6; // empieza en 1.0
+
+  function cambiarZoom(dir) {
+    zoomIdx = Math.max(0, Math.min(ZOOM_PASOS.length - 1, zoomIdx + dir));
+    const z = ZOOM_PASOS[zoomIdx];
+    document.getElementById('inner').style.transform = `scale(${z})`;
+    document.getElementById('inner').style.transformOrigin = 'top left';
+    document.getElementById('zoom-label').textContent = Math.round(z * 100) + '%';
+    document.getElementById('btn-zoom-in').disabled  = zoomIdx === ZOOM_PASOS.length - 1;
+    document.getElementById('btn-zoom-out').disabled = zoomIdx === 0;
+  }
+
+  // ── POSICIONES YA USADAS ──────────────────────────
+  let posiciones = []; // [{x, y, w, h}]
+
+  function imgW() { return Math.round(IMG_BASE_W * escalaFotos); }
+  function imgH() { return Math.round(IMG_BASE_H * escalaFotos); }
+
+  // Busca una posición libre sin solapar
+  function encontrarPosicion() {
+    const w = imgW();
+    const h = imgH();
+    const intentos = 800;
+
+    for (let i = 0; i < intentos; i++) {
+      const x = Math.floor(Math.random() * (BOARD_W - w));
+      const y = Math.floor(Math.random() * (BOARD_H - h));
+
+      const solapa = posiciones.some(p =>
+        x < p.x + p.w + MARGEN &&
+        x + w + MARGEN > p.x &&
+        y < p.y + p.h + MARGEN &&
+        y + h + MARGEN > p.y
+      );
+
+      if (!solapa) return { x, y, w, h };
+    }
+    return null; // no encontró lugar
+  }
+
+  // Si no hay lugar, achica todas las fotos y reposiciona
+  function achicaryReposicionar() {
+    if (escalaFotos <= ESCALA_MIN) return false;
+
+    escalaFotos = Math.max(ESCALA_MIN, escalaFotos - ESCALA_PASO);
+    posiciones  = [];
+
+    // Reposicionar todas las imgs existentes
+    const imgs = document.querySelectorAll('.pizza-foto');
+    imgs.forEach(img => {
+      const pos = encontrarPosicion();
+      if (pos) {
+        img.style.left   = pos.x + 'px';
+        img.style.top    = pos.y + 'px';
+        img.style.width  = pos.w + 'px';
+        img.style.height = pos.h + 'px';
+        posiciones.push(pos);
+      }
+    });
+
+    return true;
+  }
+
+  // ── INSERTAR FOTO EN EL BOARD ─────────────────────
+  function insertarFoto(url) {
+    let pos = encontrarPosicion();
+
+    // Si no hay lugar, achicamos y reintentamos
+    if (!pos) {
+      const ok = achicaryReposicionar();
+      if (!ok) return; // llegamos al mínimo, no se puede más
+      pos = encontrarPosicion();
+      if (!pos) return;
+    }
+
+    posiciones.push(pos);
+
+    const inner = document.getElementById('inner');
+    const div   = document.createElement('div');
+    div.className = 'pizza-foto-wrap';
+    div.style.left   = pos.x + 'px';
+    div.style.top    = pos.y + 'px';
+    div.style.width  = pos.w + 'px';
+    div.style.height = pos.h + 'px';
+
+    // Rotación aleatoria suave: entre -8 y +8 grados
+    const rot = (Math.random() * 16 - 8).toFixed(1);
+    div.style.transform = `rotate(${rot}deg)`;
+
+    const img = document.createElement('img');
+    img.src       = url;
+    img.className = 'pizza-foto';
+    img.draggable = false;
+
+    div.appendChild(img);
+    inner.appendChild(div);
+  }
+
+  // ── CARGAR FOTOS DESDE SUPABASE ───────────────────
+  async function cargarFotos() {
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/pizzarron?select=*&order=created_at.asc`,
+        {
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': 'Bearer ' + SUPABASE_KEY
+          }
+        }
+      );
+      const fotos = await res.json();
+      fotos.forEach(f => insertarFoto(f.url_foto));
+    } catch(e) {
+      console.error('Error cargando pizzarón:', e);
+    }
+  }
+
+  cargarFotos();
+</script>
+</body>
+</html>

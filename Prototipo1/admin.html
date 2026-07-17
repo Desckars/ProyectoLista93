@@ -168,6 +168,10 @@
       );
 
       const data = await res.json();
+      console.log('DATA CRUDA:', JSON.stringify(data));
+      console.log('ES ARRAY:', Array.isArray(data));
+      console.log('LARGO:', data?.length);
+      console.log('EDITAR:', data?.[0]?.editar);
 
       // La función devuelve null si no existe, o {id, editar} si es válido
       if (!data || data.length === 0 || data === null) {
@@ -179,7 +183,8 @@
       }
 
       // Login exitoso
-      puedeEditar = data.editar === true || data.editar === 'true' || data.editar === 'TRUE';
+    const admin = Array.isArray(data) ? data[0] : data;
+    puedeEditar = admin.editar === true || admin.editar === 'true' || admin.editar === 'TRUE';
 
       document.getElementById('pantalla-login').style.display  = 'none';
       document.getElementById('pantalla-panel').style.display  = 'block';

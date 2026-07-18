@@ -114,6 +114,58 @@
       <div id="status-calendario" class="admin-calendar-status"></div>
     </div>
   </div>
+  <div class="admin-card admin-calendar-card" style="margin-top: 24px;">
+    <div class="admin-card-header">
+      <h2>📌 Pizzarón</h2>
+    </div>
+    <div class="calendar-card-body">
+ 
+      <!-- Upload pizzarón -->
+      <div class="upload-box" id="upload-box-piz"
+        ondragover="event.preventDefault();this.classList.add('drag-over')"
+        ondragleave="this.classList.remove('drag-over')"
+        ondrop="onDropPiz(event)">
+        <div class="upload-icon">📸</div>
+        <p><strong>Arrastrá una imagen acá</strong><br>o elegila desde tu dispositivo</p>
+        <label class="btn-elegir" id="label-elegir-piz" for="input-archivo-piz">Elegir imagen</label>
+        <input type="file" id="input-archivo-piz" accept="image/*" onchange="onArchivoElegidoPiz(event)">
+      </div>
+ 
+      <!-- Preview pizzarón -->
+      <div id="preview-container-piz" style="display:none; margin: 12px 0; text-align:center;">
+        <img id="preview-img-piz" src="" alt="preview"
+          style="max-height:180px; max-width:100%; border-radius:6px; object-fit:cover;">
+        <div id="preview-nombre-piz" style="font-size:12px; color:#8899aa; margin-top:6px;"></div>
+      </div>
+ 
+      <!-- Barra progreso pizzarón -->
+      <div id="barra-container-piz" style="display:none; margin: 10px 0;">
+        <div id="barra-fondo-piz" style="background:#2a3a4a; border-radius:4px; height:8px; overflow:hidden;">
+          <div id="barra-progreso-piz" style="height:100%; background:#2D84CB; border-radius:4px; width:0%; transition:width .3s;"></div>
+        </div>
+        <div id="barra-texto-piz" style="font-size:12px; color:#8899aa; margin-top:6px; text-align:center;">Subiendo...</div>
+      </div>
+ 
+      <!-- Status pizzarón -->
+      <div id="status-piz" style="display:none; font-size:13px; font-weight:700; padding:10px; border-radius:6px; margin:10px 0;"></div>
+ 
+      <!-- Botón subir -->
+      <button class="btn" id="btn-subir-piz" onclick="subirPizzarron()" disabled
+        style="width:100%; margin-top:4px;">
+        Agregar al Pizzarón
+      </button>
+ 
+      <!-- Galería pizzarón -->
+      <div class="galeria-titulo" style="margin-top:28px;">Imágenes en el Pizzarón</div>
+      <div id="galeria-piz" style="
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 10px;
+        margin-top: 12px;
+      "></div>
+ 
+    </div>
+  </div>
 </div>
 
 <script>
@@ -168,10 +220,6 @@
       );
 
       const data = await res.json();
-      console.log('DATA CRUDA:', JSON.stringify(data));
-      console.log('ES ARRAY:', Array.isArray(data));
-      console.log('LARGO:', data?.length);
-      console.log('EDITAR:', data?.[0]?.editar);
 
       // La función devuelve null si no existe, o {id, editar} si es válido
       if (!data || data.length === 0 || data === null) {
@@ -338,14 +386,14 @@
     const esNoticia   = document.getElementById('input-es-noticia').checked; 
     const fecha       = getUruguayDate();
     const idfoto      = 'IMG-' + Date.now();
-    let   urlFoto     = null;
+    let   url_foto     = null;
 
     if (!titulo) { mostrarStatus('⚠️ Ingresá un título', 'error'); return; }
     if (!archivoActual) { mostrarStatus('⚠️ Seleccioná una imagen', 'error'); return; }
 
     try {
-      urlFoto = await subirArchivo();
-      if (!urlFoto) throw new Error('No se pudo generar la URL de la imagen');
+      url_foto = await subirArchivo();
+      if (!url_foto) throw new Error('No se pudo generar la URL de la imagen');
 
       const res = await fetch(`${SUPABASE_URL}/rest/v1/publicacion`, {
         method: 'POST',
@@ -356,7 +404,7 @@
           descripcion: descripcion || null,
           es_noticia: esNoticia,
           fecha,
-          url_foto: urlFoto
+          url_foto: url_foto
         })
       });
 
@@ -551,6 +599,171 @@
     el.style.background   = tipo === 'ok' ? '#1a3a2a' : '#3a1a1a';
     el.style.color        = tipo === 'ok' ? '#4ade80' : '#ff6b6b';
     setTimeout(() => el.style.display = 'none', 3000);
+  }
+
+  // ── PIZZARÓN ADMIN ────────────────────────────────
+  const BUCKET_PIZ = 'pizzarron';
+  let archivoPiz   = null;
+ 
+  function onArchivoElegidoPiz(e) {
+    const file = e.target.files[0];
+    if (file) mostrarPreviewPiz(file);
+  }
+ 
+  function onDropPiz(e) {
+    e.preventDefault();
+    document.getElementById('upload-box-piz').classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) mostrarPreviewPiz(file);
+  }
+ 
+  function mostrarPreviewPiz(file) {
+    if (!puedeEditar) return;
+    archivoPiz = file;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      document.getElementById('preview-img-piz').src            = e.target.result;
+      document.getElementById('preview-nombre-piz').textContent = file.name;
+      document.getElementById('preview-container-piz').style.display = 'block';
+      document.getElementById('btn-subir-piz').disabled = false;
+    };
+    reader.readAsDataURL(file);
+  }
+ 
+  function mostrarStatusPiz(msg, tipo) {
+    const el = document.getElementById('status-piz');
+    el.textContent      = msg;
+    el.style.display    = msg ? 'block' : 'none';
+    el.style.background = tipo === 'ok' ? '#1a3a2a' : '#3a1a1a';
+    el.style.color      = tipo === 'ok' ? '#4ade80' : '#ff6b6b';
+  }
+ 
+  function limpiarFormPiz() {
+    archivoPiz = null;
+    document.getElementById('input-archivo-piz').value          = '';
+    document.getElementById('preview-container-piz').style.display = 'none';
+    document.getElementById('btn-subir-piz').disabled           = true;
+  }
+ 
+  async function subirPizzarron() {
+    if (!puedeEditar) return;
+    if (!archivoPiz)  { mostrarStatusPiz('⚠️ Seleccioná una imagen', 'error'); return; }
+ 
+    document.getElementById('btn-subir-piz').disabled       = true;
+    document.getElementById('barra-container-piz').style.display = 'block';
+    document.getElementById('barra-progreso-piz').style.width    = '30%';
+    document.getElementById('barra-texto-piz').textContent       = 'Subiendo imagen...';
+    mostrarStatusPiz('', '');
+ 
+    try {
+      const ext    = archivoPiz.name.split('.').pop();
+      const nombre = 'piz_' + Date.now() + '.' + ext;
+ 
+      // 1. Subir al storage bucket pizzarron
+      const resStorage = await fetch(
+        `${SUPABASE_URL}/storage/v1/object/${BUCKET_PIZ}/${nombre}`,
+        {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': 'Bearer ' + SUPABASE_KEY,
+            'Content-Type': archivoPiz.type,
+            'x-upsert': 'true'
+          },
+          body: archivoPiz
+        }
+      );
+ 
+      if (!resStorage.ok) throw new Error('Error al subir la imagen');
+ 
+      document.getElementById('barra-progreso-piz').style.width  = '70%';
+      document.getElementById('barra-texto-piz').textContent     = 'Guardando en base de datos...';
+ 
+      // 2. Guardar URL en tabla pizzarron
+      const url = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET_PIZ}/${nombre}`;
+ 
+      const resDB = await fetch(`${SUPABASE_URL}/rest/v1/pizzarron`, {
+        method: 'POST',
+        headers: { ...headers, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ url_foto: url })
+      });
+ 
+      if (!resDB.ok) throw new Error('Error al guardar en base de datos');
+ 
+      document.getElementById('barra-progreso-piz').style.width = '100%';
+ 
+      setTimeout(() => {
+        document.getElementById('barra-container-piz').style.display = 'none';
+        document.getElementById('barra-progreso-piz').style.width    = '0%';
+      }, 600);
+ 
+      mostrarStatusPiz('✅ Imagen agregada al pizzarón', 'ok');
+      limpiarFormPiz();
+      cargarGaleriaPiz();
+ 
+    } catch (err) {
+      document.getElementById('barra-container-piz').style.display = 'none';
+      mostrarStatusPiz('❌ ' + err.message, 'error');
+      document.getElementById('btn-subir-piz').disabled = false;
+    }
+  }
+ 
+  async function cargarGaleriaPiz() {
+    const grid = document.getElementById('galeria-piz');
+    grid.innerHTML = '<div style="color:#8899aa; font-size:13px;">Cargando...</div>';
+    try {
+      const res   = await fetch(
+        `${SUPABASE_URL}/rest/v1/pizzarron?select=*&order=created_at.desc`,
+        { headers }
+      );
+      const fotos = await res.json();
+ 
+      if (!fotos.length) {
+        grid.innerHTML = '<div style="color:#8899aa; font-size:13px;">No hay imágenes todavía</div>';
+        return;
+      }
+ 
+      grid.innerHTML = fotos.map(f => `
+        <div style="position:relative; border-radius:6px; overflow:hidden; background:#1a2634;" id="piz-item-${f.id}">
+          <img src="${f.url_foto}" alt="foto pizzarón"
+            style="width:100%; height:90px; object-fit:cover; display:block;">
+          <button onclick="borrarPizzarron(${f.id}, '${f.url_foto}')"
+            style="
+              position:absolute; top:4px; right:4px;
+              background:rgba(255,107,107,.9); color:white;
+              border:none; border-radius:4px; width:22px; height:22px;
+              cursor:pointer; font-size:13px; line-height:1;
+              display:flex; align-items:center; justify-content:center;
+              ${puedeEditar ? '' : 'opacity:0.4; pointer-events:none;'}
+            ">✕</button>
+        </div>
+      `).join('');
+ 
+    } catch(e) {
+      grid.innerHTML = '<div style="color:#ff6b6b; font-size:13px;">Error al cargar</div>';
+    }
+  }
+ 
+  async function borrarPizzarron(id, url) {
+    if (!puedeEditar) return;
+    if (!confirm('¿Borrar esta imagen del pizzarón?')) return;
+ 
+    try {
+      const nombre = url.split('/').pop().split('?')[0];
+      if (nombre) {
+        await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET_PIZ}/${nombre}`, {
+          method: 'DELETE',
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+        });
+      }
+      await fetch(`${SUPABASE_URL}/rest/v1/pizzarron?id=eq.${id}`, {
+        method: 'DELETE', headers
+      });
+      document.getElementById('piz-item-' + id)?.remove();
+      mostrarStatusPiz('🗑️ Imagen borrada', 'ok');
+    } catch(e) {
+      mostrarStatusPiz('❌ Error al borrar', 'error');
+    }
   }
 </script>
 </body>

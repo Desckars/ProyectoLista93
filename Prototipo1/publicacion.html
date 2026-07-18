@@ -100,7 +100,7 @@
         document.getElementById('publicacion-titulo').textContent = publicacion.titulo || 'Sin título';
         document.getElementById('publicacion-meta').textContent = `${formatDate(publicacion.fecha)} · ${publicacion.IDfoto || ''}`;
         const img = document.getElementById('publicacion-img');
-        img.src = publicacion.UrlFoto || 'Imagenes/logo_fondo.png';
+        img.src = publicacion.url_foto || 'Imagenes/logo_fondo.png';
         img.alt = publicacion.titulo || 'Publicación';
         document.getElementById('publicacion-descripcion').textContent = publicacion.descripcion || 'Sin descripción disponible.';
       } catch (e) {

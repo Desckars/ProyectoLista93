@@ -4,10 +4,15 @@ Para ello utilizamos un proveedor externo como Supabase para el almacenamiento d
 
 ## Estructura del proyecto
 
-Prototipo1 ---> Carpeta Raiz del proyecto, contiene el README y los .html 
-|---> css ---> Contiene los estilos de la pagina
-|---> Imagenes ---> Contiene logos necesario para el correcto funcionamiento de la pagina
-|---> js ---> Contiene archivos JS con la logica 
+- **Prototipo1/**
+  - `README.md`
+  - Archivos `.html`
+  - **css/**
+    - Contiene los estilos de la página.
+  - **Imagenes/**
+    - Contiene los logos e imágenes.
+  - **js/**
+    - Contiene la lógica de la aplicación.
 
 ## Sitio web
 

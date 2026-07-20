@@ -5,7 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Panel Admin - Lista93</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="estiloadmin.css">
+<link rel="stylesheet" href="css/estiloadmin.css">
+
+<!-- Orden importante: config primero, luego los módulos, luego auth -->
+<script src="js/admin-config.js"></script>
+<script src="js/admin-publicaciones.js"></script>
+<script src="js/admin-calendario.js"></script>
+<script src="js/admin-pizzarron.js"></script>
+<script src="js/admin-auth.js"></script>
 </head>
 <body>
 
@@ -44,6 +51,7 @@
   </div>
 
   <div class="admin-grid">
+
     <!-- FORMULARIO NUEVA PUBLICACIÓN -->
     <div class="admin-card">
       <div class="admin-card-header">
@@ -55,9 +63,9 @@
         <div class="admin-form-row">
           <input type="date" id="input-fecha" class="campo-desc" readonly>
         </div>
-        <div style="margin: 15px 0; display: flex; align-items: center; gap: 8px;">
-          <input type="checkbox" id="input-es-noticia" style="width: 18px; height: 18px; cursor: pointer;">
-          <label for="input-es-noticia" style="font-size: 14px; font-weight: 700; color: #e2e8f0; cursor: pointer;">
+        <div style="margin:15px 0; display:flex; align-items:center; gap:8px;">
+          <input type="checkbox" id="input-es-noticia" style="width:18px; height:18px; cursor:pointer;">
+          <label for="input-es-noticia" style="font-size:14px; font-weight:700; color:#e2e8f0; cursor:pointer;">
             Marcar como Noticia (irá a la barra lateral)
           </label>
         </div>
@@ -70,19 +78,15 @@
           <label class="btn-elegir" id="label-elegir" for="input-archivo">Elegir imagen</label>
           <input type="file" id="input-archivo" accept="image/*" onchange="onArchivoElegido(event)">
         </div>
-
         <div id="preview-container">
           <img id="preview-img" src="" alt="preview">
           <div id="preview-nombre"></div>
         </div>
-
         <div id="barra-container">
           <div id="barra-fondo"><div id="barra-progreso"></div></div>
           <div id="barra-texto">Subiendo...</div>
         </div>
-
         <div id="status-msg"></div>
-
         <button class="btn" id="btn-subir" onclick="guardarPublicacion()" disabled>
           Guardar publicación
         </button>
@@ -97,6 +101,7 @@
       </div>
       <div id="publicaciones-admin" class="admin-list"></div>
     </div>
+
   </div>
 
   <!-- CALENDARIO -->
@@ -106,7 +111,7 @@
     </div>
     <div class="calendar-card-body">
       <div class="galeria-titulo">📅 Link del Calendario</div>
-      <div class="admin-form-row" style="margin-top: 10px;">
+      <div class="admin-form-row" style="margin-top:10px;">
         <input type="url" id="input-calendario" class="campo-desc"
           placeholder="Ingrese link de Google Calendar">
         <button class="btn" id="btn-calendario" onclick="guardarCalendario()">Guardar</button>
@@ -114,13 +119,13 @@
       <div id="status-calendario" class="admin-calendar-status"></div>
     </div>
   </div>
-  <div class="admin-card admin-calendar-card" style="margin-top: 24px;">
+
+  <!-- PIZZARÓN -->
+  <div class="admin-card admin-calendar-card" style="margin-top:24px;">
     <div class="admin-card-header">
       <h2>📌 Pizzarón</h2>
     </div>
     <div class="calendar-card-body">
- 
-      <!-- Upload pizzarón -->
       <div class="upload-box" id="upload-box-piz"
         ondragover="event.preventDefault();this.classList.add('drag-over')"
         ondragleave="this.classList.remove('drag-over')"
@@ -130,641 +135,26 @@
         <label class="btn-elegir" id="label-elegir-piz" for="input-archivo-piz">Elegir imagen</label>
         <input type="file" id="input-archivo-piz" accept="image/*" onchange="onArchivoElegidoPiz(event)">
       </div>
- 
-      <!-- Preview pizzarón -->
-      <div id="preview-container-piz" style="display:none; margin: 12px 0; text-align:center;">
+      <div id="preview-container-piz" style="display:none; margin:12px 0; text-align:center;">
         <img id="preview-img-piz" src="" alt="preview"
           style="max-height:180px; max-width:100%; border-radius:6px; object-fit:cover;">
         <div id="preview-nombre-piz" style="font-size:12px; color:#8899aa; margin-top:6px;"></div>
       </div>
- 
-      <!-- Barra progreso pizzarón -->
-      <div id="barra-container-piz" style="display:none; margin: 10px 0;">
+      <div id="barra-container-piz" style="display:none; margin:10px 0;">
         <div id="barra-fondo-piz" style="background:#2a3a4a; border-radius:4px; height:8px; overflow:hidden;">
           <div id="barra-progreso-piz" style="height:100%; background:#2D84CB; border-radius:4px; width:0%; transition:width .3s;"></div>
         </div>
         <div id="barra-texto-piz" style="font-size:12px; color:#8899aa; margin-top:6px; text-align:center;">Subiendo...</div>
       </div>
- 
-      <!-- Status pizzarón -->
       <div id="status-piz" style="display:none; font-size:13px; font-weight:700; padding:10px; border-radius:6px; margin:10px 0;"></div>
- 
-      <!-- Botón subir -->
-      <button class="btn" id="btn-subir-piz" onclick="subirPizzarron()" disabled
-        style="width:100%; margin-top:4px;">
+      <button class="btn" id="btn-subir-piz" onclick="subirPizzarron()" disabled style="width:100%; margin-top:4px;">
         Agregar al Pizzarón
       </button>
- 
-      <!-- Galería pizzarón -->
       <div class="galeria-titulo" style="margin-top:28px;">Imágenes en el Pizzarón</div>
-      <div id="galeria-piz" style="
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 10px;
-        margin-top: 12px;
-      "></div>
- 
+      <div id="galeria-piz" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:10px; margin-top:12px;"></div>
     </div>
   </div>
+
 </div>
-
-<script>
-  // ── CONFIG ────────────────────────────────────────
-  const SUPABASE_URL = 'https://lnqqmoflqbbgxstxlujy.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_ehNfp-wrQtIqlDbtNesRww_iFNWR-H3';
-  const BUCKET       = 'imagenes';
-  const PAGE_SIZE    = 10;
-
-  const headers = {
-    'apikey': SUPABASE_KEY,
-    'Authorization': 'Bearer ' + SUPABASE_KEY,
-    'Content-Type': 'application/json'
-  };
-
-  let archivoActual = null;
-  let adminPage     = 1;
-  let hasNextPage   = false;
-  let puedeEditar   = false; // se actualiza al hacer login
-
-  // ── FECHA URUGUAY ─────────────────────────────────
-  function getUruguayDate() {
-    return new Date().toLocaleDateString('sv', { timeZone: 'America/Montevideo' });
-  }
-
-  // ── LOGIN ─────────────────────────────────────────
-  async function login() {
-    const usuario  = document.getElementById('input-usuario').value.trim();
-    const password = document.getElementById('input-pass').value;
-    const btnLogin = document.getElementById('btn-login');
-    const errorEl  = document.getElementById('error-login');
-
-    if (!usuario || !password) {
-      errorEl.textContent = 'Ingresá usuario y contraseña';
-      errorEl.style.display = 'block';
-      return;
-    }
-
-    btnLogin.disabled = true;
-    btnLogin.textContent = 'Verificando...';
-    errorEl.style.display = 'none';
-
-    try {
-      // Buscar el admin por usuario y verificar contraseña con pgcrypto
-      const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/rpc/verificar_admin`,
-        {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({ p_usuario: usuario, p_password: password })
-        }
-      );
-
-      const data = await res.json();
-
-      // La función devuelve null si no existe, o {id, editar} si es válido
-      if (!data || data.length === 0 || data === null) {
-        errorEl.textContent = 'Usuario o contraseña incorrectos';
-        errorEl.style.display = 'block';
-        btnLogin.disabled = false;
-        btnLogin.textContent = 'Ingresar';
-        return;
-      }
-
-      // Login exitoso
-    const admin = Array.isArray(data) ? data[0] : data;
-    puedeEditar = admin.editar === true || admin.editar === 'true' || admin.editar === 'TRUE';
-
-      document.getElementById('pantalla-login').style.display  = 'none';
-      document.getElementById('pantalla-panel').style.display  = 'block';
-      document.getElementById('input-fecha').value = getUruguayDate();
-
-      aplicarPermisos();
-      cargarPublicaciones();
-      cargarCalendario();
-
-    } catch (err) {
-      errorEl.textContent = 'Error de conexión. Intentá de nuevo.';
-      errorEl.style.display = 'block';
-      btnLogin.disabled = false;
-      btnLogin.textContent = 'Ingresar';
-    }
-  }
-
-  // ── APLICAR PERMISOS SEGÚN editar ─────────────────
-  function aplicarPermisos() {
-    const badge    = document.getElementById('badge-editar');
-    const aviso    = document.getElementById('aviso-readonly');
-    const btnSubir = document.getElementById('btn-subir');
-    const btnCal   = document.getElementById('btn-calendario');
-    const uploadBox = document.getElementById('upload-box');
-    const labelElegir = document.getElementById('label-elegir');
-
-    badge.style.display = 'inline-block';
-
-    if (puedeEditar) {
-      badge.textContent   = '✏️ Editor';
-      badge.style.background = '#1a3a2a';
-      badge.style.color   = '#4ade80';
-      aviso.style.display = 'none';
-    } else {
-      badge.textContent   = '👁️ Solo lectura';
-      badge.style.background = '#2a1a0a';
-      badge.style.color   = '#f4a460';
-      aviso.style.display = 'block';
-
-      // Deshabilitar todo lo que modifica datos
-      btnSubir.disabled        = true;
-      btnSubir.style.opacity   = '0.4';
-      btnSubir.style.cursor    = 'not-allowed';
-      btnCal.disabled          = true;
-      btnCal.style.opacity     = '0.4';
-      btnCal.style.cursor      = 'not-allowed';
-      uploadBox.style.opacity  = '0.4';
-      uploadBox.style.pointerEvents = 'none';
-      labelElegir.style.cursor = 'not-allowed';
-
-      // Campos de texto deshabilitados
-      ['input-titulo', 'input-desc', 'input-calendario'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) { el.disabled = true; el.style.opacity = '0.5'; }
-      });
-    }
-  }
-
-  // ── SALIR ─────────────────────────────────────────
-  function salir() {
-    puedeEditar = false;
-    document.getElementById('pantalla-panel').style.display = 'none';
-    document.getElementById('pantalla-login').style.display = 'block';
-    document.getElementById('input-usuario').value = '';
-    document.getElementById('input-pass').value    = '';
-    document.getElementById('btn-login').disabled  = false;
-    document.getElementById('btn-login').textContent = 'Ingresar';
-    document.getElementById('error-login').style.display = 'none';
-  }
-
-  // ── ARCHIVO ───────────────────────────────────────
-  function onArchivoElegido(e) {
-    const file = e.target.files[0];
-    if (file) mostrarPreview(file);
-  }
-
-  function onDrop(e) {
-    e.preventDefault();
-    document.getElementById('upload-box').classList.remove('drag-over');
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) mostrarPreview(file);
-  }
-
-  function mostrarPreview(file) {
-    if (!puedeEditar) return;
-    archivoActual = file;
-    const reader  = new FileReader();
-    reader.onload = (e) => {
-      document.getElementById('preview-img').src           = e.target.result;
-      document.getElementById('preview-nombre').textContent = file.name;
-      document.getElementById('preview-container').style.display = 'block';
-      document.getElementById('btn-subir').disabled = false;
-    };
-    reader.readAsDataURL(file);
-  }
-
-  function mostrarStatus(msg, tipo) {
-    const el = document.getElementById('status-msg');
-    el.textContent    = msg;
-    el.className      = tipo;
-    el.style.display  = msg ? 'block' : 'none';
-  }
-
-  function limpiarForm() {
-    archivoActual = null;
-    document.getElementById('input-archivo').value   = '';
-    document.getElementById('input-titulo').value    = '';
-    document.getElementById('input-desc').value      = '';
-    document.getElementById('input-es-noticia').checked = false;
-    document.getElementById('preview-container').style.display = 'none';
-    document.getElementById('btn-subir').disabled    = true;
-    document.getElementById('input-fecha').value     = getUruguayDate();
-  }
-
-  // ── SUBIR IMAGEN ──────────────────────────────────
-  async function subirArchivo() {
-    const file   = archivoActual;
-    if (!file) return null;
-    const ext    = file.name.split('.').pop();
-    const nombre = Date.now() + '.' + ext;
-
-    document.getElementById('barra-container').style.display = 'block';
-    document.getElementById('barra-progreso').style.width    = '30%';
-    document.getElementById('barra-texto').textContent       = 'Subiendo imagen...';
-
-    const res = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${nombre}`, {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': 'Bearer ' + SUPABASE_KEY,
-        'Content-Type': file.type,
-        'x-upsert': 'true'
-      },
-      body: file
-    });
-
-    if (!res.ok) throw new Error('Error al subir la imagen');
-
-    document.getElementById('barra-progreso').style.width  = '70%';
-    document.getElementById('barra-texto').textContent     = 'Generando URL...';
-
-    return `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${nombre}`;
-  }
-
-  // ── GUARDAR PUBLICACIÓN ───────────────────────────
-  async function guardarPublicacion() {
-    if (!puedeEditar) return;
-
-    const titulo      = document.getElementById('input-titulo').value.trim();
-    const descripcion = document.getElementById('input-desc').value.trim();
-    const esNoticia   = document.getElementById('input-es-noticia').checked; 
-    const fecha       = getUruguayDate();
-    const idfoto      = 'IMG-' + Date.now();
-    let   url_foto     = null;
-
-    if (!titulo) { mostrarStatus('⚠️ Ingresá un título', 'error'); return; }
-    if (!archivoActual) { mostrarStatus('⚠️ Seleccioná una imagen', 'error'); return; }
-
-    try {
-      url_foto = await subirArchivo();
-      if (!url_foto) throw new Error('No se pudo generar la URL de la imagen');
-
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/publicacion`, {
-        method: 'POST',
-        headers: { ...headers, 'Prefer': 'return=minimal' },
-        body: JSON.stringify({
-          titulo,
-          IDfoto: idfoto,
-          descripcion: descripcion || null,
-          es_noticia: esNoticia,
-          fecha,
-          url_foto: url_foto
-        })
-      });
-
-      if (!res.ok) throw new Error('Error al guardar la publicación');
-
-      mostrarStatus('✅ Publicación guardada correctamente', 'ok');
-      limpiarForm();
-      cargarPublicaciones(adminPage);
-
-    } catch (err) {
-      mostrarStatus('❌ ' + err.message, 'error');
-    } finally {
-      setTimeout(() => {
-        document.getElementById('barra-container').style.display = 'none';
-        document.getElementById('barra-progreso').style.width    = '0%';
-      }, 800);
-    }
-  }
-
-  // ── HELPERS ───────────────────────────────────────
-  function formatDate(value) {
-    if (!value) return '';
-    return new Date(value).toLocaleDateString('es-UY', {
-      day: '2-digit', month: '2-digit', year: 'numeric',
-      timeZone: 'America/Montevideo'
-    });
-  }
-
-  function escapeHtml(text) {
-    return text
-      ? text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-             .replace(/"/g,'&quot;').replace(/'/g,'&#039;')
-      : '';
-  }
-
-  function toggleDescripcion(id) {
-    const descEl   = document.getElementById('admin-desc-' + id);
-    const btn      = document.getElementById('admin-toggle-' + id);
-    if (!descEl || !btn) return;
-    const full     = descEl.dataset.full || '';
-    const expanded = descEl.dataset.expanded === 'true';
-    if (expanded) {
-      descEl.textContent      = full.slice(0,100) + (full.length > 100 ? '...' : '');
-      descEl.dataset.expanded = 'false';
-      btn.textContent         = 'Ver más';
-    } else {
-      descEl.textContent      = full;
-      descEl.dataset.expanded = 'true';
-      btn.textContent         = 'Mostrar menos';
-    }
-  }
-
-  function renderPagination(page, next) {
-    const wrapper = document.getElementById('pagination-admin');
-    wrapper.innerHTML = `
-      <button class="pagination-button" onclick="cargarPublicaciones(${page-1})"
-        ${page===1?'disabled':''}>Anterior</button>
-      <span>Página ${page}</span>
-      <button class="pagination-button" onclick="cargarPublicaciones(${page+1})"
-        ${!next?'disabled':''}>Siguiente</button>
-    `;
-  }
-
-  // ── CARGAR PUBLICACIONES ──────────────────────────
-  async function cargarPublicaciones(page = 1) {
-    adminPage      = page;
-    const hoy      = getUruguayDate();
-    const offset   = (page-1) * PAGE_SIZE;
-    const grid     = document.getElementById('publicaciones-admin');
-    grid.innerHTML = '<div class="galeria-vacia">Cargando publicaciones...</div>';
-
-    try {
-      const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/publicacion?select=*&fecha=lte.${hoy}&order=fecha.desc,id.desc&limit=${PAGE_SIZE+1}&offset=${offset}`,
-        { headers }
-      );
-      const publicaciones = await res.json();
-      hasNextPage = publicaciones.length > PAGE_SIZE;
-      if (hasNextPage) publicaciones.pop();
-
-      if (!publicaciones.length) {
-        grid.innerHTML = '<div class="galeria-vacia">No hay publicaciones disponibles</div>';
-      } else {
-        // Botón borrar: gris si no puede editar
-        const borrarStyle = puedeEditar
-          ? ''
-          : 'opacity:0.4; cursor:not-allowed; pointer-events:none;';
-
-        grid.innerHTML = publicaciones.map(p => `
-          <div class="admin-item" id="item-${p.id}">
-            <div class="admin-item-media">
-              <img src="${p.url_foto || 'Imagenes/logo_fondo.png'}"
-                   alt="${escapeHtml(p.titulo || 'Publicación')}">
-            </div>
-            <div class="admin-item-main">
-              <div class="admin-item-header">
-                <div>
-                  <div class="admin-item-title">${escapeHtml(p.titulo)}</div>
-                  <div class="admin-item-meta">
-                    ${formatDate(p.fecha)} · ID: ${escapeHtml(p.IDfoto || '-')}
-                  </div>
-                </div>
-                <button class="btn-borrar" style="${borrarStyle}"
-                  onclick="${puedeEditar ? `borrarPublicacion(${p.id}, '${p.url_foto || ''}')` : 'mostrarAvisoSinPermiso()'}"
-                  title="${puedeEditar ? 'Borrar' : 'Sin permisos'}">✕</button>
-              </div>
-              <div class="admin-item-desc"
-                   id="admin-desc-${p.id}"
-                   data-full="${escapeHtml(p.descripcion || '')}"
-                   data-expanded="false">
-                ${escapeHtml((p.descripcion||'').slice(0,100))}${(p.descripcion||'').length>100?'...':''}
-              </div>
-              ${p.descripcion && p.descripcion.length > 100
-                ? `<button class="toggle-btn" id="admin-toggle-${p.id}"
-                     onclick="toggleDescripcion(${p.id})">Ver más</button>`
-                : ''}
-            </div>
-          </div>
-        `).join('');
-      }
-    } catch (e) {
-      grid.innerHTML = '<div class="galeria-vacia">Error al cargar publicaciones</div>';
-    }
-    renderPagination(page, hasNextPage);
-  }
-
-  function mostrarAvisoSinPermiso() {
-    mostrarStatus('⚠️ No tenés permisos para realizar esta acción', 'error');
-    setTimeout(() => mostrarStatus('', ''), 3000);
-  }
-
-  // ── BORRAR PUBLICACIÓN ────────────────────────────
-  async function borrarPublicacion(id, url) {
-    if (!puedeEditar) { mostrarAvisoSinPermiso(); return; }
-    if (!confirm('¿Borrar esta publicación?')) return;
-
-    try {
-      if (url) {
-        const nombre = url.split('/').pop().split('?')[0];
-        if (nombre) {
-          await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${nombre}`, {
-            method: 'DELETE',
-            headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-          });
-        }
-      }
-      await fetch(`${SUPABASE_URL}/rest/v1/publicacion?id=eq.${id}`, {
-        method: 'DELETE', headers
-      });
-      document.getElementById('item-' + id)?.remove();
-      mostrarStatus('🗑️ Publicación borrada', 'ok');
-      cargarPublicaciones(adminPage);
-    } catch (e) {
-      mostrarStatus('❌ Error al borrar', 'error');
-    }
-  }
-
-  // ── CALENDARIO ────────────────────────────────────
-  async function cargarCalendario() {
-    try {
-      const res  = await fetch(`${SUPABASE_URL}/rest/v1/calendario?id=eq.1&select=link`, { headers });
-      const data = await res.json();
-      if (data.length && data[0].link)
-        document.getElementById('input-calendario').value = data[0].link;
-    } catch (e) { console.error('Error cargando calendario:', e); }
-  }
-
-  async function guardarCalendario() {
-    if (!puedeEditar) { mostrarAvisoSinPermiso(); return; }
-    const link = document.getElementById('input-calendario').value.trim();
-    if (!link || !/^(https:\/\/calendar\.google\.com|https:\/\/www\.google\.com\/calendar)/.test(link)) {
-      mostrarStatusCal('⚠️ Pegá un link válido de Google Calendar', 'error');
-      return;
-    }
-    try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/calendario?id=eq.1`, {
-        method: 'PATCH',
-        headers: { ...headers, 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ link })
-      });
-      if (!res.ok) throw new Error('Error al guardar');
-      mostrarStatusCal('✅ Link guardado correctamente', 'ok');
-    } catch (e) {
-      mostrarStatusCal('❌ Error al guardar el link', 'error');
-    }
-  }
-
-  function mostrarStatusCal(msg, tipo) {
-    const el = document.getElementById('status-calendario');
-    el.textContent        = msg;
-    el.style.display      = 'block';
-    el.style.background   = tipo === 'ok' ? '#1a3a2a' : '#3a1a1a';
-    el.style.color        = tipo === 'ok' ? '#4ade80' : '#ff6b6b';
-    setTimeout(() => el.style.display = 'none', 3000);
-  }
-
-  // ── PIZZARÓN ADMIN ────────────────────────────────
-  const BUCKET_PIZ = 'pizzarron';
-  let archivoPiz   = null;
- 
-  function onArchivoElegidoPiz(e) {
-    const file = e.target.files[0];
-    if (file) mostrarPreviewPiz(file);
-  }
- 
-  function onDropPiz(e) {
-    e.preventDefault();
-    document.getElementById('upload-box-piz').classList.remove('drag-over');
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) mostrarPreviewPiz(file);
-  }
- 
-  function mostrarPreviewPiz(file) {
-    if (!puedeEditar) return;
-    archivoPiz = file;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      document.getElementById('preview-img-piz').src            = e.target.result;
-      document.getElementById('preview-nombre-piz').textContent = file.name;
-      document.getElementById('preview-container-piz').style.display = 'block';
-      document.getElementById('btn-subir-piz').disabled = false;
-    };
-    reader.readAsDataURL(file);
-  }
- 
-  function mostrarStatusPiz(msg, tipo) {
-    const el = document.getElementById('status-piz');
-    el.textContent      = msg;
-    el.style.display    = msg ? 'block' : 'none';
-    el.style.background = tipo === 'ok' ? '#1a3a2a' : '#3a1a1a';
-    el.style.color      = tipo === 'ok' ? '#4ade80' : '#ff6b6b';
-  }
- 
-  function limpiarFormPiz() {
-    archivoPiz = null;
-    document.getElementById('input-archivo-piz').value          = '';
-    document.getElementById('preview-container-piz').style.display = 'none';
-    document.getElementById('btn-subir-piz').disabled           = true;
-  }
- 
-  async function subirPizzarron() {
-    if (!puedeEditar) return;
-    if (!archivoPiz)  { mostrarStatusPiz('⚠️ Seleccioná una imagen', 'error'); return; }
- 
-    document.getElementById('btn-subir-piz').disabled       = true;
-    document.getElementById('barra-container-piz').style.display = 'block';
-    document.getElementById('barra-progreso-piz').style.width    = '30%';
-    document.getElementById('barra-texto-piz').textContent       = 'Subiendo imagen...';
-    mostrarStatusPiz('', '');
- 
-    try {
-      const ext    = archivoPiz.name.split('.').pop();
-      const nombre = 'piz_' + Date.now() + '.' + ext;
- 
-      // 1. Subir al storage bucket pizzarron
-      const resStorage = await fetch(
-        `${SUPABASE_URL}/storage/v1/object/${BUCKET_PIZ}/${nombre}`,
-        {
-          method: 'POST',
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': 'Bearer ' + SUPABASE_KEY,
-            'Content-Type': archivoPiz.type,
-            'x-upsert': 'true'
-          },
-          body: archivoPiz
-        }
-      );
- 
-      if (!resStorage.ok) throw new Error('Error al subir la imagen');
- 
-      document.getElementById('barra-progreso-piz').style.width  = '70%';
-      document.getElementById('barra-texto-piz').textContent     = 'Guardando en base de datos...';
- 
-      // 2. Guardar URL en tabla pizzarron
-      const url = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET_PIZ}/${nombre}`;
- 
-      const resDB = await fetch(`${SUPABASE_URL}/rest/v1/pizzarron`, {
-        method: 'POST',
-        headers: { ...headers, 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ url_foto: url })
-      });
- 
-      if (!resDB.ok) throw new Error('Error al guardar en base de datos');
- 
-      document.getElementById('barra-progreso-piz').style.width = '100%';
- 
-      setTimeout(() => {
-        document.getElementById('barra-container-piz').style.display = 'none';
-        document.getElementById('barra-progreso-piz').style.width    = '0%';
-      }, 600);
- 
-      mostrarStatusPiz('✅ Imagen agregada al pizzarón', 'ok');
-      limpiarFormPiz();
-      cargarGaleriaPiz();
- 
-    } catch (err) {
-      document.getElementById('barra-container-piz').style.display = 'none';
-      mostrarStatusPiz('❌ ' + err.message, 'error');
-      document.getElementById('btn-subir-piz').disabled = false;
-    }
-  }
- 
-  async function cargarGaleriaPiz() {
-    const grid = document.getElementById('galeria-piz');
-    grid.innerHTML = '<div style="color:#8899aa; font-size:13px;">Cargando...</div>';
-    try {
-      const res   = await fetch(
-        `${SUPABASE_URL}/rest/v1/pizzarron?select=*&order=created_at.desc`,
-        { headers }
-      );
-      const fotos = await res.json();
- 
-      if (!fotos.length) {
-        grid.innerHTML = '<div style="color:#8899aa; font-size:13px;">No hay imágenes todavía</div>';
-        return;
-      }
- 
-      grid.innerHTML = fotos.map(f => `
-        <div style="position:relative; border-radius:6px; overflow:hidden; background:#1a2634;" id="piz-item-${f.id}">
-          <img src="${f.url_foto}" alt="foto pizzarón"
-            style="width:100%; height:90px; object-fit:cover; display:block;">
-          <button onclick="borrarPizzarron(${f.id}, '${f.url_foto}')"
-            style="
-              position:absolute; top:4px; right:4px;
-              background:rgba(255,107,107,.9); color:white;
-              border:none; border-radius:4px; width:22px; height:22px;
-              cursor:pointer; font-size:13px; line-height:1;
-              display:flex; align-items:center; justify-content:center;
-              ${puedeEditar ? '' : 'opacity:0.4; pointer-events:none;'}
-            ">✕</button>
-        </div>
-      `).join('');
- 
-    } catch(e) {
-      grid.innerHTML = '<div style="color:#ff6b6b; font-size:13px;">Error al cargar</div>';
-    }
-  }
- 
-  async function borrarPizzarron(id, url) {
-    if (!puedeEditar) return;
-    if (!confirm('¿Borrar esta imagen del pizzarón?')) return;
- 
-    try {
-      const nombre = url.split('/').pop().split('?')[0];
-      if (nombre) {
-        await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET_PIZ}/${nombre}`, {
-          method: 'DELETE',
-          headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-        });
-      }
-      await fetch(`${SUPABASE_URL}/rest/v1/pizzarron?id=eq.${id}`, {
-        method: 'DELETE', headers
-      });
-      document.getElementById('piz-item-' + id)?.remove();
-      mostrarStatusPiz('🗑️ Imagen borrada', 'ok');
-    } catch(e) {
-      mostrarStatusPiz('❌ Error al borrar', 'error');
-    }
-  }
-</script>
 </body>
 </html>
